@@ -1,0 +1,1 @@
+[(#{templates.sms.text.notifyUsernameChange.title})]: [(#{templates.sms.text.notifyUsernameChange.bodyText})]

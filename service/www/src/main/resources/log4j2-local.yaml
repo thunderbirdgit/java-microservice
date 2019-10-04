@@ -1,0 +1,25 @@
+configuration:
+  name: "local"
+  status: "trace"
+  appenders:
+    appender:
+      - type: "console"
+        name: "LogToConsole"
+        patternLayout:
+          pattern: "%d{ISO8601} %t %5p %c{1}[%L]: %m%n%ex"
+  loggers:
+    logger:
+      - name: "com.openease"
+        level: "trace"
+        additivity: false
+        appenderRef:
+          - ref: "LogToConsole"
+      - name: "org.springframework.data.elasticsearch"
+        level: "trace"
+        additivity: false
+        appenderRef:
+          - ref: "LogToConsole"
+    root:
+      level: "error"
+      appenderRef:
+        - ref: "LogToConsole"

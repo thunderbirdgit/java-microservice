@@ -1,0 +1,24 @@
+# Spring Boot
+management:
+  endpoint:
+    health:
+      show-details: "never"
+
+# Config
+config:
+  url: "https://@service.name@.openease.com"
+  mask5xxErrors: true
+  filters:
+    debug:
+      enabled: false
+
+# Managers
+manager:
+  eventLog:
+    enabled: true
+  payment:
+    stripe:
+      api:
+        key:
+          public: "FILL-ME-IN"
+          private: "FILL-ME-IN"

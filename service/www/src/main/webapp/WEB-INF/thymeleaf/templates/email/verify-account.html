@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="#{templates.email.html.verifyAccount.title}">Subject: ${subject}</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+</head>
+<body style="font-family: sans-serif">
+<p th:text="#{templates.email.default.greeting} + ${#strings.isEmpty(firstName) ? '' : (' ' + firstName)} + ','">
+  Greetings John,
+</p>
+<p>
+  <span th:text="#{templates.email.html.verifyAccount.bodyText}">Templates email verifyAccount body text</span>:<br/>
+  <a th:href="${verificationUrl}" th:text="${verificationUrl}" href="http://verification-link">http://verification-link</a>
+</p>
+<p>
+  <span th:text="#{templates.email.default.farewell}">Regards</span>,<br/>
+  <em><span th:text="#{templates.email.default.signature}">The Openease Team</span></em><br/>
+  <img th:src="${#strings.isEmpty(logoFileName) ? '/img/openease-logo-email-125x16.png' : ('cid:' + logoFileName)}" src="./img/openease-logo-email-125x16.png" width="125" height="16" alt="Openease logo"/>
+</p>
+</body>
+</html>

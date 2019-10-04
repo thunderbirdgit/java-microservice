@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+
+  @docker.artifactId@:
+    image: "@docker.image.name@:@project.version@"
+    container_name: "@docker.artifactId@"
+    environment:
+      - "OPENEASE_ENV=${OPENEASE_ENV}"
+    ports:
+      - "@service.port@:@service.port@"
+    networks:
+      openease:
+        aliases:
+          - "@docker.artifactId@"
+
+networks:
+  openease:
+    name: "openease"

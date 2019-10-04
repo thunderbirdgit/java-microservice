@@ -1,0 +1,38 @@
+# Spring Boot
+server:
+  compression:
+    enabled: false
+management:
+  health:
+    elasticsearch:
+      enabled: false
+spring:
+  thymeleaf:
+    cache: false
+#  elasticsearch:
+#    rest:
+#      uris: "http://host.docker.internal:9200"
+
+# Config
+config:
+  url: "http://localhost:@service.port@"
+  mask5xxErrors: false
+  filters:
+    debug:
+      enabled: true
+
+# Managers
+manager:
+  eventLog:
+    enabled: false
+  remoteEmail:
+    api:
+      baseUrl: "http://host.docker.internal:8180/v1/emails"
+  remoteSms:
+    api:
+      baseUrl: "http://host.docker.internal:8280/v1/sms"
+  remotePayment:
+    api:
+      baseUrl: "https://host.docker.internal:8380/v1/payments"
+  captcha:
+    enabled: false

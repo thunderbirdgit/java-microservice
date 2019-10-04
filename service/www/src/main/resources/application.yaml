@@ -1,0 +1,162 @@
+# Spring Boot
+server:
+  port: @service.port@
+  compression:
+    enabled: true
+  http2:
+    enabled: true
+  servlet:
+    encoding:
+      enabled: true
+      charset: "UTF-8"
+      force: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health, info, monitoring"
+      cors:
+        allowed-origins: "https://openease.com, https://*.openease.com, http://local.openease.com*, http://localhost*"
+        allowed-methods: "HEAD, GET, POST, PUT, DELETE, OPTIONS"
+        allowed-headers: "X-Requested-With, Content-Type, Accept, Origin"
+        exposed-headers:
+        allow-credentials: true
+        max-age: 3600
+  endpoint:
+    health:
+      show-details: "always"
+spring:
+  application:
+    name: "@project.name@"
+  profiles:
+    active: "${@environment.systemProperty@}"
+  thymeleaf:
+    enabled: true
+    cache: true
+    mode: "TEXT"
+    encoding: "UTF-8"
+    servlet:
+      content-type: "text/html"
+    prefix: "/WEB-INF/thymeleaf/"
+    suffix: ".html"
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: "FILL-ME-IN"
+#            client-secret: "FILL-ME-IN"
+#            redirectUriTemplate: "http://localhost:8080/login/oauth2/code/{registrationId}"
+#          facebook:
+#            client-id: "..."
+#            client-secret: "..."
+
+# JavaMelody
+javamelody:
+  enabled: true
+  spring-monitoring-enabled: true
+  management-endpoint-monitoring-enabled: true
+  init-parameters:
+    log: true
+    authorized-users: "admin:@buildNumber@"
+#    url-exclude-pattern: "(/.*\\.css|/.*\\.js|/.*\\.png|/.*\\.jpg|/.*\\.gif|/.*\\.svg)"
+
+# Actuator: info
+info:
+  app:
+    name: "@project.name@"
+    description: "@project.description@"
+    version: "@project.version@"
+  env: "${@environment.systemProperty@}"
+
+# Config
+config:
+
+  # General
+  name: "@project.name@"
+  description: "@project.description@"
+  simpleName: "@project.name@"
+  groupId: "@project.groupId@"
+  artifactId: "@project.artifactId@"
+  version: "@project.version@"
+  buildDateYear: @date.current.year@
+  encoding: "@project.build.sourceEncoding@"
+  vendor:
+    name: "@project.organization.name@"
+    simpleName: "@project.organization.name@"
+    url: "@project.organization.url@"
+    logoAsciiResourcePath: "/com/openease/common/openease-logo-ascii.txt"
+
+  # System Properties
+  systemProperties:
+    environmentKey: "@environment.systemProperty@"
+
+  mask5xxErrors: false
+  filters:
+    debug:
+      enabled: true
+
+# Message Source
+messageSource:
+  basenames: >
+    classpath:/com/openease/service/www/lang/application-messages
+
+# Task Executor
+taskExecutor:
+  corePoolSize: 50
+  maxPoolSize: 100
+  queueCapacity: 1000
+
+# Services
+service:
+  elasticsearchEmbedded:
+    version: "@elasticsearch.version@"
+    homeDirectory: "./target/elasticsearch"
+    cluster:
+      name: "local-cluster"
+    node:
+      name: "local-node"
+    network:
+      host: "0.0.0.0"
+
+# Managers
+manager:
+  eventLog:
+    enabled: true
+  template:
+    prefix: "/WEB-INF/thymeleaf/templates"
+  captcha:
+    api:
+      key:
+        public: "FILL-ME-IN"
+        private: "FILL-ME-IN"
+    restUrl: "https://www.google.com/recaptcha/api/siteverify"
+  subscription:
+    # plan names are derived from the i18n message resources
+    # tier values must match: com.openease.common.data.model.account.Tier
+    # cost values are set in cents (decimals are not allowed)
+    plans:
+      # Plan: Free
+      - tier: "TIER0"
+        cost:
+          currency: "USD"
+          perMonth: 0
+          perYear: 0
+      # Plan: Basic
+      - tier: "TIER1"
+        cost:
+          currency: "USD"
+          perMonth: 500
+          perYear: 5000
+      # Plan: Pro
+      - tier: "TIER2"
+        cost:
+          currency: "USD"
+          perMonth: 1000
+          perYear: 10000
+
+# Dummy account
+dummyAccount:
+  email: "jane.doe@example.com"
+  firstName: "Jane"
+  lastName: "Doe"

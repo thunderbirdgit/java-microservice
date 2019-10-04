@@ -1,0 +1,32 @@
+configuration:
+  name: "dev"
+  status: "debug"
+  appenders:
+    appender:
+      - type: "console"
+        name: "LogToConsole"
+        patternLayout:
+          pattern: "%d{ISO8601} %t %5p %c{1}[%L]: %m%n%ex"
+#      - type: "rollingFile"
+#        name: "LogToRollingFile"
+#        patternLayout:
+#          pattern: "%d{ISO8601} %t %5p %c{1}[%L]: %m%n%ex"
+#        fileName: "./logs/app.log"
+#        filePattern: "./logs/app-%d{yyyy-MM-dd}-%i.log.gz"
+#        policies:
+#          sizeBasedTriggeringPolicy:
+#            size: "10MB"
+#        defaultRollOverStrategy:
+#          max: 10
+  loggers:
+    logger:
+      - name: "com.openease"
+        level: "trace"
+        additivity: false
+        appenderRef:
+          - ref: "LogToConsole"
+#          - ref: "LogToRollingFile"
+    root:
+      level: "error"
+      appenderRef:
+        - ref: "LogToConsole"

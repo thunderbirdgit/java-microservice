@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xml:lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="#{pages.verification.title}">${subject}</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+</head>
+<body style="font-family: sans-serif">
+<div>
+  <!-- ### INSERT HEADER HERE ### -->
+</div>
+<div th:switch="${codeFound}">
+  <div th:case="false">
+    invalid code
+  </div>
+  <div th:case="true">
+    valid code
+  </div>
+  <div th:case="*">
+    Should never happen, but who knows ...
+  </div>
+</div>
+<div>
+  <span th:text="#{pages.verification.bodyText}">Pages verification body text</span><br/>
+  Code: <span th:text="${verificationCode}">VERIFICATION-CODE</span>
+</div>
+<div>
+  <!-- ### INSERT FOOTER HERE ### -->
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Config
+config:
+  url: "https://@service.name@.dev.openease.com"
+  mask5xxErrors: false
+  filters:
+    debug:
+      enabled: true
+
+# Managers
+manager:
+  remoteEmail:
+    api:
+      baseUrl: "https://email.dev.openease.com/v1/emails"
+  remoteSms:
+    api:
+      baseUrl: "http://sms.dev.openease.com/v1/sms"
+  remotePayment:
+    api:
+      baseUrl: "https://payment.dev.openease.com/v1/payments"
+  captcha:
+    enabled: true
