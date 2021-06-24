@@ -101,9 +101,4 @@ public class DefaultErrorController extends BaseMvcController implements ErrorCo
     return responseEntity;
   }
 
-  @Override
-  public String getErrorPath() {
-    return getPath();
-  }
-
 }
