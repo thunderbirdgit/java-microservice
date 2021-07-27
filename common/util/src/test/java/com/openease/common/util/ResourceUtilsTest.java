@@ -35,7 +35,7 @@ public class ResourceUtilsTest {
       actual = expected;
     }
 
-    assertEquals(actual, expected, ResourceUtils.class.getSimpleName() + ".readResourceIntoString(resourcePath) failed");
+    assertEquals(expected, actual, ResourceUtils.class.getSimpleName() + ".readResourceIntoString(resourcePath) failed");
   }
 
 }
