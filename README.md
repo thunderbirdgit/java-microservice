@@ -39,7 +39,6 @@ This project is an example of how to organize, architect, design, develop, and b
   - standardize API request and response objects
 - use containerization for all micro-services
   - [Docker](https://www.docker.com/)
-  - [Phusion base image](https://github.com/phusion/baseimage-docker)
 - ensure build artifacts are environment-agnostic
   - application run-time determines how application starts based on the environment passed in
 - use an [effective Java build tool](https://maven.apache.org/) and plugins to optimize entire build process

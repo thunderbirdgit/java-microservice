@@ -1,4 +1,4 @@
-FROM registry.hub.docker.com/phusion/baseimage:focal-1.0.0
+FROM registry.hub.docker.com/library/ubuntu:20.04
 
 ENV DEBIAN_FRONTEND="noninteractive" \
     LANG="en_US.UTF-8" \
