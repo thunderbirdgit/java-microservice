@@ -1,5 +1,5 @@
-[![Language: Java](https://img.shields.io/badge/Language-Java-blue.svg "Language: Java")](https://www.java.com/)
-[![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-yellow.svg "Version: 1.0.0")](https://gitlab.com/openease/java-microservice-example/-/tags)
+[![Language: Java 11](https://img.shields.io/badge/Language-Java_11-blue.svg "Language: Java 11")](https://www.java.com/)
+[![Framework: Spring Boot 2.5](https://img.shields.io/badge/Framework-Spring_Boot_2.5-green.svg "Framework: Spring Boot 2.5")](https://spring.io/projects/spring-boot)
 
 # Java Microservice Example
 
