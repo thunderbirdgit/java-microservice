@@ -161,7 +161,7 @@ Example:
 ```shell
 $ cd <project-root>
 $ mvn clean install
-$ cd target/deploy/compose/
+$ cd service/www/target/deploy/compose/
 $ OPENEASE_ENV=dev docker-compose up
 ```
 
@@ -171,7 +171,7 @@ $ OPENEASE_ENV=dev docker-compose up
 
 Example:
 ```shell
-$ cd <project-root>/target/deploy/compose/
+$ cd <project-root>/service/www/target/deploy/compose/
 $ docker-compose down --remove-orphans
 ```
 
