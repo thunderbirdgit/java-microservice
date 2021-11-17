@@ -215,7 +215,7 @@ Example:
       profiles:
         active: "${com.openease.env}"
     ```
-  - Spring then injects the value into: `active: "${com.openease.env}"`
+  - Spring then injects the value into: `active: "${com.openease.env}"` (from the Java system property passed in on the command-line: `-Dcom.openease.env=${OPENEASE_ENV}`)
   - application YAML config file names specific to an environment (i.e. `application-{env}.yaml`) must follow the `com.openease.common.Env` enum values (lowercase)
     - example:
       - `application-local.yaml`
