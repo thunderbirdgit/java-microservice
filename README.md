@@ -62,14 +62,24 @@ This project is an example of how to organize, architect, design, develop, and b
 
 ## Java & Docker Build
 
+Ensure you have the correct version of Maven (3.8.x) and the JDK (11):
+```shell
+$ mvn --version
+Apache Maven 3.8.x
+Maven home: ...
+Java version: 11.0.x, vendor: ...
+Default locale: ...
+OS name: ...
+```
+
 Build the Java & Docker artifacts locally:
-```shell script
+```shell
 $ cd <project-root>
 $ mvn clean install
 ```
 
-Build the Java & Docker artifacts locally without running tests:
-```shell script
+Build the Java & Docker artifacts locally _quickly_ (without running tests):
+```shell
 $ cd <project-root>
 $ mvn clean install -Dmaven.test.skip=true
 ```
@@ -84,17 +94,17 @@ $ mvn clean install -Dmaven.test.skip=true
 > 127.0.0.1   kubernetes.docker.internal
 > ```
 
-```shell script
+```shell
 $ cd <project-root>/service/<service-name>
 ```
 
 Run a local instance on the existing web app project:
-```shell script
+```shell
 $ mvn clean spring-boot:run
 ```
 
 which is the equivalent to:
-```shell script
+```shell
 $ mvn clean spring-boot:run -P env-local
 ```
 
@@ -102,7 +112,7 @@ The application starts with the default environment set to "local". To change th
 starts as, a Maven profile needs to be passed in on the command-line:
 
 start the application locally _as if_ it was in the DEV environment:
-```shell script
+```shell
 $ mvn clean spring-boot:run -P env-dev
 ```
 
@@ -111,7 +121,7 @@ $ mvn clean spring-boot:run -P env-dev
 > - use <kbd>Ctrl</kbd>+<kbd>c</kbd> to stop the application
 
 start the application locally _as if_ it was in the PROD environment:
-```shell script
+```shell
 $ mvn clean spring-boot:run -P env-prod
 ```
 
@@ -148,7 +158,7 @@ Check the running micro-service application (change port 8080 to appropriate sta
 #### Start the application's Docker container(s) from a local build:
 
 Example:
-```shell script
+```shell
 $ cd <project-root>
 $ mvn clean install
 $ cd target/deploy/compose/
@@ -160,7 +170,7 @@ $ OPENEASE_ENV=dev docker-compose up
 #### Stop & clean-up the application's Docker container(s) from a local build:
 
 Example:
-```shell script
+```shell
 $ cd <project-root>/target/deploy/compose/
 $ docker-compose down --remove-orphans
 ```
@@ -170,11 +180,11 @@ $ docker-compose down --remove-orphans
 Example:
 
 - find the running Docker container ID:
-  ```shell script
+  ```shell
   $ docker ps -a
   ```
 - put the Docker container ID into the Docker exec command
-  ```shell script
+  ```shell
   $ docker exec -it <container-id> /bin/bash
   ```
 
@@ -183,11 +193,11 @@ Example:
 
 - all configurations have been implemented using YAML (where possible)
 - the application starts up based on the environment variable (`OPENEASE_ENV`) that is passed in on command-line:
-  ```shell script
+  ```shell
   $ OPENEASE_ENV=dev docker-compose up
   ```
   - the `OPENEASE_ENV` environment variable is passed into the Docker container, and eventually reaches this java command inside the `Dockerfile`:
-    ```shell script
+    ```shell
     java ${JVM_OPTS} -Dcom.openease.env=${OPENEASE_ENV} -Dlog4j2.configurationFile=log4j2-${OPENEASE_ENV}.yaml -jar ...
     ```
   - the `OPENEASE_ENV` environment variable must be set to a value of the `com.openease.common.Env` enum (lowercase)
@@ -239,7 +249,7 @@ Example:
 
 - logging uses the Log4J (v2.x) framework: https://logging.apache.org/log4j/2.x/
 - logging configuration is determined by the environment variable that is passed in on command-line (see `Dockerfile`)
-  ```shell script
+  ```shell
   $ java ${JVM_OPTS} -Dcom.openease.env=${OPENEASE_ENV} -Dlog4j2.configurationFile=log4j2-${OPENEASE_ENV}.yaml -jar ...
   ```
   - the `log4j2.configurationFile` Java system property determines which logging configuration file to use
