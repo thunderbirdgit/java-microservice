@@ -19,6 +19,11 @@ configuration:
         additivity: false
         appenderRef:
           - ref: "LogToConsole"
+#      - name: "org.springframework.security"
+#        level: "trace"
+#        additivity: false
+#        appenderRef:
+#          - ref: "LogToConsole"
     root:
       level: "error"
       appenderRef:

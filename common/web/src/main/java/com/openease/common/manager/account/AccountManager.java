@@ -83,13 +83,13 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
   @Autowired
   private AuthenticationManager authenticationManager;
 
-//  @Value("${dummyAccount.email}")
+//  @Value("${dummy-account.email}")
 //  private String dummyAccountEmail;
 //
-//  @Value("${dummyAccount.firstName}")
+//  @Value("${dummy-account.first-name}")
 //  private String dummyAccountFirstName;
 //
-//  @Value("${dummyAccount.lastName}")
+//  @Value("${dummy-account.last-name}")
 //  private String dummyAccountLastName;
 
   @PostConstruct
@@ -161,7 +161,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
         throw new RuntimeException("Something really bad happened", e);
       }
     } else {
-      LOG.debug("Account is verified, do not send verification email");
+      LOG.debug("Account is verified, *not* sending verification email");
     }
 
     LOG.debug("account: {}", account::toStringUsingMixIn);
@@ -176,7 +176,6 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     }
 
     Account account = new Account()
-        .setId()
         .setUsername(request.getEmail())
         .setFirstName(request.getFirstName())
         .setLastName(request.getLastName())
@@ -199,6 +198,22 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
       account = optional.get();
     } else {
       throw new GeneralManagerException(CRUD_NOTFOUND, "Account with id [" + id + "] *not* found");
+    }
+
+    return account;
+  }
+
+  public Account update(Account account) throws GeneralManagerException {
+    final Account finalAccount = account;
+    LOG.debug("account: {}", () -> (finalAccount == null ? null : finalAccount.toStringUsingMixIn()));
+    checkForNullAccount(account);
+
+    try {
+      account = accountDao.update(account);
+      LOG.trace("account: {}", account::toStringUsingMixIn);
+    } catch (GeneralDataException de) {
+      // re-throw
+      throw new GeneralManagerException(de.getKey(), de.getMessage());
     }
 
     return account;
@@ -241,12 +256,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
           .setVerified(false);
     }
 
-    try {
-      accountToUpdate = accountDao.update(accountToUpdate);
-    } catch (GeneralDataException de) {
-      // re-throw
-      throw new GeneralManagerException(de.getKey(), de.getMessage());
-    }
+    update(accountToUpdate);
 
     // send emails if username (email) has changed (staleAccount will be non-null)
     if (staleAccount != null) {
@@ -351,7 +361,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
             .setCurrentPassword(null)
             .setNewPassword(newPassword);
         try {
-          //TODO: skip current password verification
+          //TODO: add skip current password verification
           updatePassword(account, request);
         } catch (GeneralManagerException me) {
           LOG.error(me::getMessage, me);
@@ -408,7 +418,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     Authentication authentication;
 
     try {
-      authentication = new UsernamePasswordAuthenticationToken(account, password);
+      authentication = new UsernamePasswordAuthenticationToken(account, password, account.getAuthorities());
       authentication = authenticationManager.authenticate(authentication);
     } catch (AuthenticationException ae) {
       LOG.warn("{}: {}", () -> ae.getClass().getSimpleName(), ae::getMessage);
@@ -579,9 +589,9 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     if (account != null) {
       String username = trim(lowerCase(account.getUsername()));
       Date createdDate = new Date();
-      account.setUsername(username)
+      account.setId()
+          .setUsername(username)
           .setEnabled(true)
-          .setVerified(false)
           .addRoles(USER)
           .setLocale(locale)
           .setCreated(createdDate)

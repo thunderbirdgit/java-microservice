@@ -27,7 +27,7 @@ public class DefaultMessageSource extends ReloadableResourceBundleMessageSource 
 
   private static final transient Logger LOG = LogManager.getLogger(DefaultMessageSource.class);
 
-  @Value("${messageSource.basenames}")
+  @Value("${message-source.basenames}")
   private String[] messageSourceBasenames;
 
   @Autowired

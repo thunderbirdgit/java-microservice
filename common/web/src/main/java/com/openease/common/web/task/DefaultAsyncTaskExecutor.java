@@ -23,13 +23,13 @@ public class DefaultAsyncTaskExecutor extends ThreadPoolTaskExecutor implements 
 
   private static final String THREAD_NAME_PREFIX = "default-task-executor-";
 
-  @Value("${taskExecutor.corePoolSize}")
+  @Value("${task-executor.core-pool-size}")
   private Integer corePoolSize;
 
-  @Value("${taskExecutor.maxPoolSize}")
+  @Value("${task-executor.max-pool-size}")
   private Integer maxPoolSize;
 
-  @Value("${taskExecutor.queueCapacity}")
+  @Value("${task-executor.queue-capacity}")
   private Integer queueCapacity;
 
   public DefaultAsyncTaskExecutor() {

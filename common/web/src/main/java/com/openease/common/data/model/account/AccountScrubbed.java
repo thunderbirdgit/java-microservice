@@ -230,6 +230,17 @@ public class AccountScrubbed extends BaseAuditDataModel<AccountScrubbed> impleme
   }
 
   @Override
+  public String getImageUrl() {
+    return account.getImageUrl();
+  }
+
+  @Override
+  public AccountScrubbed setImageUrl(String imageUrl) {
+    account.setImageUrl(imageUrl);
+    return this;
+  }
+
+  @Override
   public Date getCreated() {
     return account.getCreated();
   }

@@ -22,7 +22,7 @@ public class DefaultPasswordEncoder extends BCryptPasswordEncoder implements Pas
   /**
    * @see {@link BCryptPasswordEncoder}
    */
-  private static final int BCRYPT_PASSWORD_ENCODER_STRENGTH = 12;
+  private static final int BCRYPT_PASSWORD_ENCODER_STRENGTH = 14;
 
   public DefaultPasswordEncoder() {
     super(BCRYPT_PASSWORD_ENCODER_STRENGTH);

@@ -26,7 +26,7 @@ import static com.openease.common.util.JsonPasswordSerializer.MASK;
 import static com.openease.common.util.JsonUtils.toJson;
 import static com.openease.common.util.ResourceUtils.readResourceIntoString;
 import static java.lang.System.lineSeparator;
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.containsAnyIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.trim;
 
@@ -169,9 +169,7 @@ public abstract class BaseWebApplication extends SpringBootServletInitializer im
   }
 
   private static void appendToStringBuilder(StringBuilder sb, String prefix, String key, Object value) {
-    if (containsIgnoreCase(key, "password") ||
-        containsIgnoreCase(key, "private")
-    ) {
+    if (containsAnyIgnoreCase(key, "password", "private", "secret")) {
       value = MASK;
     }
     sb.append(prefix).append(key).append("=").append(value).append(lineSeparator());

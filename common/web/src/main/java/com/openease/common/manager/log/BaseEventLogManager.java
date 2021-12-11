@@ -29,7 +29,7 @@ public abstract class BaseEventLogManager implements EventLogManager {
 
   private static final transient Logger LOG = LogManager.getLogger(BaseEventLogManager.class);
 
-  @Value("${manager.eventLog.enabled}")
+  @Value("${manager.event-log.enabled}")
   protected boolean enabled;
 
   @Autowired

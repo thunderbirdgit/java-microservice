@@ -111,11 +111,20 @@ public class AccountsController extends BaseApiController {
   }
 
   @PreAuthorize("isAuthenticated()")
+  @GetMapping(path = "/me")
+  public SuccessApiResponse read(HttpServletRequest httpRequest) {
+    String accountId = sessionManager.getSignedInAccountId();
+    return read(accountId, httpRequest);
+  }
+
+  @PreAuthorize("isAuthenticated()")
   @GetMapping(path = "/{id:" + ID_REGEX_RELAXED + "}")
   public SuccessApiResponse<AccountScrubbed> read(@PathVariable String id, HttpServletRequest httpRequest) {
     LOG.trace("id: {}", id);
+    if (id == null) {
+      throw new ApiException(NOT_FOUND, CRUD_NOTFOUND);
+    }
 
-    LOG.debug("Check account IDs match");
     checkIdMatch(id, sessionManager.getSignedInAccountId());
 
     SuccessApiResponse<AccountScrubbed> response;
@@ -144,7 +153,6 @@ public class AccountsController extends BaseApiController {
     LOG.trace("id: {}", id);
     LOG.trace("accountScrubbed: {}", () -> (accountScrubbed == null ? null : accountScrubbed.toStringUsingMixIn()));
 
-    LOG.debug("Check account IDs match");
     checkIdMatch(id, sessionManager.getSignedInAccountId());
     checkIdMatch(id, accountScrubbed.getId());
 
@@ -163,7 +171,7 @@ public class AccountsController extends BaseApiController {
       account = accountManager.update(accountScrubbed);
 
       if (usernameChanged) {
-        LOG.debug("Update session with new credentials");
+        LOG.debug("Update security context with new credentials");
         Authentication authentication = accountManager.verifyPassword(account, accountScrubbed.getPasswordVerification());
         sessionManager.updateSecurityContext(authentication);
       }
@@ -190,7 +198,6 @@ public class AccountsController extends BaseApiController {
   public SuccessApiResponse<AccountScrubbed> disable(@PathVariable String id, HttpServletRequest httpRequest) {
     LOG.trace("id: {}", id);
 
-    LOG.debug("Check account IDs match");
     checkIdMatch(id, sessionManager.getSignedInAccountId());
 
     SuccessApiResponse<AccountScrubbed> response;
@@ -219,7 +226,6 @@ public class AccountsController extends BaseApiController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping(path = "/{id:" + ID_REGEX_RELAXED + "}/_sendVerificationCode")
   public SuccessApiResponse sendVerificationCode(@PathVariable String id, HttpServletRequest httpRequest) {
-    LOG.debug("Check account IDs match");
     checkIdMatch(id, sessionManager.getSignedInAccountId());
 
     SuccessApiResponse response;
@@ -251,7 +257,6 @@ public class AccountsController extends BaseApiController {
       throw new ApiException();
     }
 
-    LOG.debug("Check account IDs match");
     checkIdMatch(id, sessionManager.getSignedInAccountId());
 
     SuccessApiResponse response;
@@ -261,7 +266,7 @@ public class AccountsController extends BaseApiController {
       account = sessionManager.getSignedInAccount();
       accountManager.updatePassword(account, request);
 
-      LOG.debug("Update session with new credentials");
+      LOG.debug("Update security context with new credentials");
       Authentication authentication = accountManager.verifyPassword(account, request.getNewPassword());
       sessionManager.updateSecurityContext(authentication);
 

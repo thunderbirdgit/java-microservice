@@ -14,11 +14,29 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health, info, monitoring"
+        include:
+          - "health"
+          - "info"
+          - "monitoring"
       cors:
-        allowed-origins: "https://openease.com, https://*.openease.com, http://local.openease.com*, http://localhost*"
-        allowed-methods: "HEAD, GET, POST, PUT, DELETE, OPTIONS"
-        allowed-headers: "X-Requested-With, Content-Type, Accept, Origin"
+        allowed-origin-patterns:
+          - "https://openease.com:[*]"
+          - "https://*.openease.com:[*]"
+          - "http://local.openease.com:[*]"
+          - "http://localhost:[*]"
+        allowed-methods:
+          - "HEAD"
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "PATCH"
+          - "OPTIONS"
+        allowed-headers:
+          - "X-Requested-With"
+          - "Content-Type"
+          - "Accept"
+          - "Origin"
         exposed-headers:
         allow-credentials: true
         max-age: 3600
@@ -64,43 +82,64 @@ config:
   # General
   name: "@project.name@"
   description: "@project.description@"
-  simpleName: "@project.name@"
-  groupId: "@project.groupId@"
-  artifactId: "@project.artifactId@"
+  simple-name: "@project.name@"
+  group-id: "@project.groupId@"
+  artifact-id: "@project.artifactId@"
   version: "@project.version@"
-  buildDateYear: @date.current.year@
+  build-date-year: @date.current.year@
   encoding: "@project.build.sourceEncoding@"
   vendor:
     name: "@project.organization.name@"
-    simpleName: "@project.organization.name@"
+    simple-name: "@project.organization.name@"
     url: "@project.organization.url@"
-    logoAsciiResourcePath: "/com/openease/common/openease-logo-ascii.txt"
+    logo-ascii-resource-path: "/com/openease/common/openease-logo-ascii.txt"
 
   # System Properties
-  systemProperties:
-    environmentKey: "@environment.systemProperty@"
+  system-properties:
+    environment-key: "@environment.systemProperty@"
 
-  mask5xxErrors: false
+  mask-5xx-errors: false
   filters:
     debug:
       enabled: true
 
+  cors:
+    allowed-origin-patterns:
+      - "https://openease.com:[*]"
+      - "https://*.openease.com:[*]"
+      - "http://local.openease.com:[*]"
+      - "http://localhost:[*]"
+    allowed-methods:
+      - "HEAD"
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "PATCH"
+      - "OPTIONS"
+    allowed-headers:
+      - "*"
+    exposed-headers:
+    allow-credentials: true
+    max-age-seconds: 3600
+
 # Message Source
-messageSource:
+message-source:
+  # comma-separated list
   basenames: >
     classpath:/com/openease/service/email/lang/application-messages
 
 # Task Executor
-taskExecutor:
-  corePoolSize: 50
-  maxPoolSize: 100
-  queueCapacity: 1000
+task-executor:
+  core-pool-size: 50
+  max-pool-size: 100
+  queue-capacity: 1000
 
 # Services
 service:
-  elasticsearchEmbedded:
+  elasticsearch-embedded:
     version: "@elasticsearch.version@"
-    homeDirectory: "./target/elasticsearch"
+    home-directory: "./target/elasticsearch"
     cluster:
       name: "local-cluster"
     node:
@@ -110,7 +149,7 @@ service:
 
 # Managers
 manager:
-  eventLog:
+  event-log:
     enabled: true
   template:
     prefix: "/WEB-INF/thymeleaf/templates"
@@ -119,7 +158,7 @@ manager:
     smtp:
       host: "smtp.gmail.com"
       port: 587
-      starttls:
+      start-tls:
         enabled: true
       ssl:
         enabled: false
@@ -128,8 +167,8 @@ manager:
     sender:
       address: "no-reply@example.com"
       name: "No-reply | Example Corp"
-    replyTo:
+    reply-to:
       address: "reply@example.com"
       name: "Reply | Example Corp"
     message:
-      mimeType: "text/html;charset=UTF-8"
+      mime-type: "text/html;charset=UTF-8"

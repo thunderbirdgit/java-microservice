@@ -12,6 +12,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -23,6 +24,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,7 +51,7 @@ import static org.apache.commons.lang3.StringUtils.trim;
  * @author Alan Czajkowski
  */
 @Document(indexName = ACCOUNTS)
-public class Account extends BaseAuditDataModel<Account> implements AccountInterface<Account>, UserDetails {
+public class Account extends BaseAuditDataModel<Account> implements AccountInterface<Account>, UserDetails, OAuth2User {
 
   public static final String ACCOUNTS = "accounts";
 
@@ -103,6 +105,11 @@ public class Account extends BaseAuditDataModel<Account> implements AccountInter
 
   private String companyName;
 
+  @Field(type = FieldType.Object)
+  private OAuth2 oAuth2;
+
+  private String imageUrl;
+
   public Account() {
     this(null);
   }
@@ -135,6 +142,8 @@ public class Account extends BaseAuditDataModel<Account> implements AccountInter
     this.lastName = null;
     this.gender = UNKNOWN;
     this.companyName = null;
+    this.oAuth2 = null;
+    this.imageUrl = null;
   }
 
   @Override
@@ -402,6 +411,36 @@ public class Account extends BaseAuditDataModel<Account> implements AccountInter
   public Account setCompanyName(String companyName) {
     this.companyName = companyName;
     return this;
+  }
+
+  public OAuth2 getOAuth2() {
+    return oAuth2;
+  }
+
+  public Account setOAuth2(OAuth2 oAuth2) {
+    this.oAuth2 = oAuth2;
+    return this;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public Account setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
+    return this;
+  }
+
+  @Override
+  @JsonIgnore
+  public Map<String, Object> getAttributes() {
+    return getOAuth2().getUserAttributes();
+  }
+
+  @Override
+  @JsonIgnore
+  public String getName() {
+    return getUsername();
   }
 
   private abstract class MixIn extends Account {

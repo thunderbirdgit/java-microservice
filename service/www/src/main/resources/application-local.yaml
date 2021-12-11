@@ -16,14 +16,14 @@ spring:
 # Config
 config:
   url: "http://localhost:@service.port@"
-  mask5xxErrors: false
+  mask-5xx-errors: false
   filters:
     debug:
       enabled: true
 
 # Managers
 manager:
-  eventLog:
+  event-log:
     enabled: false
   remoteEmail:
     api:

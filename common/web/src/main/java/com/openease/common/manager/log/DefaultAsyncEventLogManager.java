@@ -55,7 +55,7 @@ public class DefaultAsyncEventLogManager extends BaseEventLogManager {
       //TODO: deal with this future somehow (since task may fail)
       Future<EventLog> taskFuture = asyncTaskExecutor.submit(task);
     } else {
-      LOG.warn("{} disabled, ignoring create(..., \"{}\", ...)", EventLogManager.class.getSimpleName(), description);
+      LOG.warn("{} disabled, ignoring create(..., \"{}\", ...)", EventLogManager.class::getSimpleName, () -> description);
     }
 
     return eventLog;

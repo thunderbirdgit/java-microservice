@@ -74,7 +74,7 @@ public class SmtpEmailManager implements EmailManager {
   @Value("${manager.email.smtp.port}")
   private String smtpPort;
 
-  @Value("${manager.email.smtp.starttls.enabled}")
+  @Value("${manager.email.smtp.start-tls.enabled}")
   private String smtpStartTlsEnabled;
 
   @Value("${manager.email.smtp.ssl.enabled}")
@@ -92,13 +92,13 @@ public class SmtpEmailManager implements EmailManager {
   @Value("${manager.email.sender.name}")
   private String senderName;
 
-  @Value("${manager.email.replyTo.address:}")
+  @Value("${manager.email.reply-to.address:}")
   private String replyToEmailAddress;
 
-  @Value("${manager.email.replyTo.name:}")
+  @Value("${manager.email.reply-to.name:}")
   private String replyToName;
 
-  @Value("${manager.email.message.mimeType}")
+  @Value("${manager.email.message.mime-type}")
   private String messageMimeType;
 
   @Autowired

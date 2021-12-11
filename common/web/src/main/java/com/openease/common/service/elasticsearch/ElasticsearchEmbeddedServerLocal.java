@@ -44,19 +44,19 @@ public class ElasticsearchEmbeddedServerLocal implements ElasticsearchEmbeddedSe
 
   private static final AtomicBoolean STARTED = new AtomicBoolean(false);
 
-  @Value("${service.elasticsearchEmbedded.version}")
+  @Value("${service.elasticsearch-embedded.version}")
   private String version;
 
-  @Value("${service.elasticsearchEmbedded.homeDirectory}")
+  @Value("${service.elasticsearch-embedded.home-directory}")
   private String homeDirectory;
 
-  @Value("${service.elasticsearchEmbedded.cluster.name}")
+  @Value("${service.elasticsearch-embedded.cluster.name}")
   private String clusterName;
 
-  @Value("${service.elasticsearchEmbedded.node.name}")
+  @Value("${service.elasticsearch-embedded.node.name}")
   private String nodeName;
 
-  @Value("${service.elasticsearchEmbedded.network.host}")
+  @Value("${service.elasticsearch-embedded.network.host}")
   private String networkHost;
 
   private Node node;

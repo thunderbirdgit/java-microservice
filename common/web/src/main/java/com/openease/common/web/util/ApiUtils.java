@@ -20,6 +20,7 @@ import java.util.Locale;
 import static com.openease.common.data.lang.MessageKeys.CRUD_ID_MISMATCH;
 import static com.openease.common.web.mvc.base.exception.MvcException.DEFAULT_ERROR_HTTP_STATUS;
 import static com.openease.common.web.util.HttpUtils.getIpAddress;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -102,12 +103,17 @@ public final class ApiUtils {
   }
 
   public static void checkIdMatch(String idInUrl, String idInObject) {
+    LOG.debug("Check IDs match");
     LOG.debug("idInUrl: {}", idInUrl);
     LOG.debug("idInObject: {}", idInObject);
     if (!StringUtils.equals(idInUrl, idInObject)) {
       HttpServletRequest httpRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
       String queryString = httpRequest.getQueryString();
-      String uri = httpRequest.getRequestURI() + (isNotBlank(queryString) ? ("?" + queryString) : "");
+      String uri = httpRequest.getRequestURI() + (
+          isNotBlank(queryString)
+              ? ("?" + queryString)
+              : EMPTY
+      );
       //TODO: do more than just log, send to event log?
       LOG.error("Hacking Detected: IP:[{}] {}:[{}] URL-ID:[{}] does not match Object-ID:[{}]", () -> getIpAddress(httpRequest), httpRequest::getMethod, () -> uri, () -> idInUrl, () -> idInObject);
       throw new ApiException(FORBIDDEN, CRUD_ID_MISMATCH);

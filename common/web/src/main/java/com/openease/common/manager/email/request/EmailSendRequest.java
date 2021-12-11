@@ -13,6 +13,7 @@ import java.util.List;
 import static com.openease.common.manager.lang.MessageKeys.VALIDATION_EMAILSENDREQUEST_HTMLBODY_NOTNULL;
 import static com.openease.common.manager.lang.MessageKeys.VALIDATION_EMAILSENDREQUEST_SUBJECT_NOTBLANK;
 import static com.openease.common.manager.lang.MessageKeys.VALIDATION_EMAILSENDREQUEST_TORECIPIENTS_NOTEMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * Email: Send request
@@ -51,8 +52,8 @@ public class EmailSendRequest extends BaseManagerModel {
     this.toRecipients = new ArrayList<>();
     this.ccRecipients = new ArrayList<>();
     this.bccRecipients = new ArrayList<>();
-    this.subject = "";
-    this.htmlBody = "";
+    this.subject = EMPTY;
+    this.htmlBody = EMPTY;
     this.attachments = new ArrayList<>();
     this.inlineImages = new ArrayList<>();
   }

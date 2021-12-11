@@ -35,7 +35,7 @@ public class CaptchaManager {
   @Value("${manager.captcha.enabled}")
   private boolean enabled;
 
-  @Value("${manager.captcha.restUrl}")
+  @Value("${manager.captcha.rest-url}")
   private String restUrl;
 
   @Value("${manager.captcha.api.key.public}")

@@ -76,8 +76,6 @@ public class SessionManager {
    */
   public void delete() {
     LOG.debug("Signing out account username: [{}]", BaseSecurityConfig::getSignedInUsername);
-
-    // destroy authentication
     updateSecurityContext(null);
   }
 
@@ -94,7 +92,7 @@ public class SessionManager {
   }
 
   public void updateSecurityContext(Authentication authentication) {
-    LOG.trace("Setting authentication token in session");
+    LOG.trace("Setting authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 

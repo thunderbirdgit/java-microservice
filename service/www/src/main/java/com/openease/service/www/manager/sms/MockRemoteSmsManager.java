@@ -21,6 +21,7 @@ import static com.openease.common.util.JsonUtils.toJson;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * Mock remote SMS manager
@@ -45,8 +46,8 @@ public class MockRemoteSmsManager extends DefaultRemoteSmsManager implements Rem
 
     try {
       String dateAndTime = LocalDateTime.now().format(ISO_LOCAL_DATE_TIME)
-          .replace("-", "")
-          .replace(":", "");
+          .replace("-", EMPTY)
+          .replace(":", EMPTY);
       String filePath = "./target/" + RemoteSmsManager.class.getSimpleName() + "/" + request.getClass().getSimpleName() + "-" + dateAndTime + ".json";
       Path path = Paths.get(filePath);
       byte[] bytes = toJson(request).getBytes(UTF_8);

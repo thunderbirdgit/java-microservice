@@ -9,11 +9,15 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.openease.common.Env.local;
 
 /**
- * Class definition of the <code>config</code> object inside the <code>application*.yaml</code> configuration files
+ * Class definition of the <code>config</code> object inside the
+ * <code>application*.yaml</code> configuration files
  *
  * @author Alan Czajkowski
  */
@@ -40,9 +44,17 @@ public class Config {
 
   private SystemProperties systemProperties;
 
-  private Boolean mask5xxErrors;
+  private boolean mask5xxErrors;
 
   private Filters filters;
+
+  private Cors cors;
+
+  private Auth auth;
+
+  public Config() {
+    this.mask5xxErrors = true;
+  }
 
   public String getName() {
     return name;
@@ -143,11 +155,11 @@ public class Config {
     return this;
   }
 
-  public Boolean getMask5xxErrors() {
+  public boolean getMask5xxErrors() {
     return mask5xxErrors;
   }
 
-  public Config setMask5xxErrors(Boolean mask5xxErrors) {
+  public Config setMask5xxErrors(boolean mask5xxErrors) {
     this.mask5xxErrors = mask5xxErrors;
     return this;
   }
@@ -158,6 +170,24 @@ public class Config {
 
   public Config setFilters(Filters filters) {
     this.filters = filters;
+    return this;
+  }
+
+  public Cors getCors() {
+    return cors;
+  }
+
+  public Config setCors(Cors cors) {
+    this.cors = cors;
+    return this;
+  }
+
+  public Auth getAuth() {
+    return auth;
+  }
+
+  public Config setAuth(Auth auth) {
+    this.auth = auth;
     return this;
   }
 
@@ -241,14 +271,182 @@ public class Config {
   }
 
   public static class Debug {
-    private Boolean enabled;
+    private boolean enabled;
 
-    public Boolean getEnabled() {
+    public Debug() {
+      this.enabled = false;
+    }
+
+    public boolean getEnabled() {
       return enabled;
     }
 
-    public Debug setEnabled(Boolean enabled) {
+    public Debug setEnabled(boolean enabled) {
       this.enabled = enabled;
+      return this;
+    }
+  }
+
+  public static class Cors {
+    /**
+     * Comma-separated list of origins to allow. '*' allows all origins.
+     * When credentials are allowed, '*' cannot be used and origin patterns
+     * should be configured instead. When no allowed origins (or allowed origin
+     * patterns) are set, CORS support is disabled.
+     */
+    private List<String> allowedOrigins;
+
+    /**
+     * Comma-separated list of origin patterns to allow. Unlike allowed origins
+     * which only supports '*', origin patterns are more flexible (for example:
+     * 'https://*.example.com') and can be used when credentials are allowed.
+     * When no allowed origin patterns (or allowed origins) are set, CORS
+     * support is disabled.
+     */
+    private List<String> allowedOriginPatterns;
+
+    /**
+     * Comma-separated list of methods to allow. '*' allows all methods.
+     * When not set, defaults to GET.
+     */
+    private List<String> allowedMethods;
+
+    /**
+     * Comma-separated list of headers to allow in a request. '*' allows all headers.
+     */
+    private List<String> allowedHeaders;
+
+    /**
+     * Comma-separated list of headers to include in a response.
+     */
+    private List<String> exposedHeaders;
+
+    /**
+     * Whether credentials are supported.
+     */
+    private boolean allowCredentials;
+
+    /**
+     * How long in seconds the response from a pre-flight request can be cached by clients.
+     */
+    private long maxAgeSeconds;
+
+    public Cors() {
+      this.allowedOrigins = new ArrayList<>();
+      this.allowedOriginPatterns = new ArrayList<>();
+      this.allowedMethods = new ArrayList<>();
+      this.allowedHeaders = new ArrayList<>();
+      this.exposedHeaders = new ArrayList<>();
+      this.allowCredentials = false;
+      this.maxAgeSeconds = Duration.ofMinutes(30).toSeconds();
+    }
+
+    public List<String> getAllowedOrigins() {
+      return allowedOrigins;
+    }
+
+    public Cors setAllowedOrigins(List<String> allowedOrigins) {
+      this.allowedOrigins = allowedOrigins;
+      return this;
+    }
+
+    public List<String> getAllowedOriginPatterns() {
+      return allowedOriginPatterns;
+    }
+
+    public Cors setAllowedOriginPatterns(List<String> allowedOriginPatterns) {
+      this.allowedOriginPatterns = allowedOriginPatterns;
+      return this;
+    }
+
+    public List<String> getAllowedMethods() {
+      return allowedMethods;
+    }
+
+    public Cors setAllowedMethods(List<String> allowedMethods) {
+      this.allowedMethods = allowedMethods;
+      return this;
+    }
+
+    public List<String> getAllowedHeaders() {
+      return allowedHeaders;
+    }
+
+    public Cors setAllowedHeaders(List<String> allowedHeaders) {
+      this.allowedHeaders = allowedHeaders;
+      return this;
+    }
+
+    public List<String> getExposedHeaders() {
+      return exposedHeaders;
+    }
+
+    public Cors setExposedHeaders(List<String> exposedHeaders) {
+      this.exposedHeaders = exposedHeaders;
+      return this;
+    }
+
+    public boolean isAllowCredentials() {
+      return allowCredentials;
+    }
+
+    public Cors setAllowCredentials(boolean allowCredentials) {
+      this.allowCredentials = allowCredentials;
+      return this;
+    }
+
+    public long getMaxAgeSeconds() {
+      return maxAgeSeconds;
+    }
+
+    public Cors setMaxAgeSeconds(long maxAgeSeconds) {
+      this.maxAgeSeconds = maxAgeSeconds;
+      return this;
+    }
+  }
+
+  public static class Auth {
+    private String tokenSecret;
+    private long tokenExpirationMilliseconds;
+    private OAuth2 oAuth2;
+
+    public String getTokenSecret() {
+      return tokenSecret;
+    }
+
+    public Auth setTokenSecret(String tokenSecret) {
+      this.tokenSecret = tokenSecret;
+      return this;
+    }
+
+    public long getTokenExpirationMilliseconds() {
+      return tokenExpirationMilliseconds;
+    }
+
+    public Auth setTokenExpirationMilliseconds(long tokenExpirationMilliseconds) {
+      this.tokenExpirationMilliseconds = tokenExpirationMilliseconds;
+      return this;
+    }
+
+    public OAuth2 getOAuth2() {
+      return oAuth2;
+    }
+
+    public Auth setOAuth2(OAuth2 oAuth2) {
+      this.oAuth2 = oAuth2;
+      return this;
+    }
+  }
+
+  public static class OAuth2 {
+    private List<String> authorizedRedirectUris;
+
+    public List<String> getAuthorizedRedirectUris() {
+      return authorizedRedirectUris;
+    }
+
+    public OAuth2 setAuthorizedRedirectUris(List<String> authorizedRedirectUris) {
+      this.authorizedRedirectUris = authorizedRedirectUris;
       return this;
     }
   }

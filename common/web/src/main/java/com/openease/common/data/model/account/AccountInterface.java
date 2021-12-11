@@ -69,6 +69,10 @@ public interface AccountInterface<ACCOUNT extends AccountInterface> {
 
   ACCOUNT setCompanyName(String companyName);
 
+  String getImageUrl();
+
+  ACCOUNT setImageUrl(String imageUrl);
+
   Date getCreated();
 
   ACCOUNT setCreated(Date created);

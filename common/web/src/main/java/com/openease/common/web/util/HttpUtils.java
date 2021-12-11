@@ -4,9 +4,11 @@ import com.blueconic.browscap.Capabilities;
 import com.blueconic.browscap.ParseException;
 import com.blueconic.browscap.UserAgentParser;
 import com.blueconic.browscap.UserAgentService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -14,11 +16,13 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
 import static com.google.common.net.HttpHeaders.X_USER_IP;
 import static java.lang.System.lineSeparator;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -65,7 +69,7 @@ public final class HttpUtils {
    * @return IP address found in HTTP request
    */
   public static String getIpAddress(HttpServletRequest httpRequest) {
-    String ipAddress = "";
+    String ipAddress = EMPTY;
 
     if (httpRequest != null) {
       ipAddress = httpRequest.getHeader(HTTP_HEADER_X_REAL_IP);
@@ -127,6 +131,42 @@ public final class HttpUtils {
       sb.append(prefix).append(headerName).append(": ").append(headerValue).append(lineSeparator());
     }
     return sb.toString();
+  }
+
+  public static Optional<Cookie> getCookie(HttpServletRequest httpRequest, String name) {
+    Cookie[] cookies = httpRequest.getCookies();
+
+    if (cookies != null && cookies.length > 0) {
+      for (Cookie cookie : cookies) {
+        if (StringUtils.equals(cookie.getName(), name)) {
+          return Optional.of(cookie);
+        }
+      }
+    }
+
+    return Optional.empty();
+  }
+
+  public static void addCookie(HttpServletResponse httpResponse, String name, String value, int maxAgeSeconds) {
+    Cookie cookie = new Cookie(name, value);
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge(maxAgeSeconds);
+    httpResponse.addCookie(cookie);
+  }
+
+  public static void deleteCookie(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String name) {
+    Cookie[] cookies = httpRequest.getCookies();
+    if (cookies != null && cookies.length > 0) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(name)) {
+          cookie.setValue(EMPTY);
+          cookie.setPath("/");
+          cookie.setMaxAge(0);
+          httpResponse.addCookie(cookie);
+        }
+      }
+    }
   }
 
 }

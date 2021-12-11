@@ -7,12 +7,12 @@ management:
 # Config
 config:
   url: "https://@service.name@.openease.com"
-  mask5xxErrors: true
+  mask-5xx-errors: true
   filters:
     debug:
       enabled: false
 
 # Managers
 manager:
-  eventLog:
+  event-log:
     enabled: true

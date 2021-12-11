@@ -1,5 +1,6 @@
 package com.openease.common.web.mvc;
 
+import com.openease.common.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -25,6 +27,9 @@ public abstract class BaseWebConfig implements WebMvcConfigurer, ApplicationCont
   private static final transient Logger LOG = LogManager.getLogger(BaseWebConfig.class);
 
   @Autowired
+  private Config config;
+
+  @Autowired
   @Qualifier("messageSource")
   protected MessageSource messageSource;
 
@@ -33,6 +38,17 @@ public abstract class BaseWebConfig implements WebMvcConfigurer, ApplicationCont
   public void init() {
     LOG.debug("{} loaded: {}", MessageSource.class::getSimpleName, () -> (messageSource != null));
     LOG.debug("{} loaded: {}", ApplicationContext.class::getSimpleName, () -> (applicationContext != null));
+  }
+
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+        .allowedOrigins(config.getCors().getAllowedOrigins().toArray(String[]::new))
+        .allowedOriginPatterns(config.getCors().getAllowedOriginPatterns().toArray(String[]::new))
+        .allowedMethods(config.getCors().getAllowedMethods().toArray(String[]::new))
+        .allowedHeaders(config.getCors().getAllowedHeaders().toArray(String[]::new))
+        .allowCredentials(config.getCors().isAllowCredentials())
+        .maxAge(config.getCors().getMaxAgeSeconds());
   }
 
   /**

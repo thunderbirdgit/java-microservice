@@ -11,6 +11,7 @@ import java.util.IllformedLocaleException;
 import java.util.Locale;
 
 import static com.openease.common.data.model.base.BaseDataModel.DEFAULT_LOCALE;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -26,7 +27,7 @@ public class PhoneNumber extends BaseModel<PhoneNumber> {
 
   public PhoneNumber() {
     this.regionCode = DEFAULT_LOCALE.getCountry();
-    this.number = "";
+    this.number = EMPTY;
   }
 
   public String getRegionCode() {

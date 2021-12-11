@@ -50,13 +50,13 @@ public class TemplatesController extends BaseMvcController {
 
   public static final String TEMPLATES_CONTEXT = "/" + TEMPLATES;
 
-  @Value("${dummyAccount.email}")
+  @Value("${dummy-account.email}")
   private String dummyAccountEmail;
 
-  @Value("${dummyAccount.firstName}")
+  @Value("${dummy-account.first-name}")
   private String dummyAccountFirstName;
 
-  @Value("${dummyAccount.lastName}")
+  @Value("${dummy-account.last-name}")
   private String dummyAccountLastName;
 
   @Autowired

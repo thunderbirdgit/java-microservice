@@ -20,7 +20,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.ALWAYS;
+import static com.openease.common.data.model.account.Role.ADMIN;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 /**
  * Base security config
@@ -47,7 +48,7 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private AuthenticationProvider authenticationProvider;
 
-  public void init() {
+  protected void init() {
     // do nothing
   }
 
@@ -82,32 +83,48 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.authenticationProvider(authenticationProvider);
+    auth.authenticationProvider(authenticationProvider)
+        .userDetailsService(accountManager)
+        .passwordEncoder(passwordEncoder);
   }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.userDetailsService(accountManager)
+    http
 
-        // session handling
+        /* Account Management */
+        .userDetailsService(accountManager)
+
+        /* Session Handling */
         .sessionManagement()
-        .sessionCreationPolicy(ALWAYS)
+          .sessionCreationPolicy(STATELESS) // use JWT cookie if needed
+          .and()
 
-        .and()
-
-        // security exception handling
+        /* Security Exception Handling */
         .exceptionHandling()
-        .authenticationEntryPoint(authenticationEntryPoint)
+          .authenticationEntryPoint(authenticationEntryPoint)
+          .and()
 
-        .and()
+        /* End-point Access */
+        .anonymous()
+          .disable()
+        .authorizeRequests()
+          .anyRequest()
+            .permitAll()
+          //TODO: JavaMelody authorization handling
+//          .antMatchers("/monitoring")
+//            .hasRole(ADMIN.name())
+          .and()
 
-        //TODO: JavaMelody authorization handling
-//        .authorizeRequests().antMatchers("/monitoring").hasRole(ADMIN.name())
-//        .anyRequest().permitAll().and()
-//        .anonymous().disable()
+        /* Cross-Site Request Forgery (CSRF) */
+        .csrf()
+          .disable()
 
-        .csrf().disable()
-        .headers().frameOptions().sameOrigin();
+        /* HTTP Headers */
+        .headers()
+          .frameOptions()
+          .sameOrigin()
+    ;
   }
 
   public static Account getSignedInAccount() {
@@ -115,18 +132,20 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication == null) {
-      LOG.trace("No authentication token in session");
+      LOG.trace("No authentication in security context");
     } else {
+      LOG.debug("{} is of type: {}", Authentication.class::getSimpleName, () -> authentication.getClass().getSimpleName());
       Object principal = authentication.getPrincipal();
       if (principal != null) {
+        LOG.debug("{}.principal is of type: {}", () -> authentication.getClass().getSimpleName(), () -> principal.getClass().getSimpleName());
         if (principal instanceof Account) {
           account = (Account) principal;
           LOG.trace("account{id: [{}], username: [{}]}", account::getId, account::getUsername);
         } else {
-          LOG.warn("Authentication principal is *not* of type {}", Account.class::getSimpleName);
+          LOG.warn("{}.principal is *not* of type: {}", () -> authentication.getClass().getSimpleName(), Account.class::getSimpleName);
         }
       } else {
-        LOG.warn("Authentication principal is *null*");
+        LOG.warn("{}.principal is null", () -> authentication.getClass().getSimpleName());
       }
     }
 
