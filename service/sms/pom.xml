@@ -70,7 +70,7 @@
           <execution>
             <id>repackage</id>
             <configuration>
-              <classifier>exec</classifier>
+              <classifier>${classifier.executable}</classifier>
             </configuration>
           </execution>
         </executions>

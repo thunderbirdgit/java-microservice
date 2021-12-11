@@ -10,8 +10,8 @@ LABEL groupId="@project.groupId@" \
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost:@service.port@/info/_status || exit 1
 
-ADD ./@project.build.finalName@-exec.@project.packaging@ ${OPENEASE_HOME}
+ADD ./@project.build.finalName@-@classifier.executable@.@project.packaging@ ${OPENEASE_HOME}
 
 EXPOSE @service.port@
 
-CMD [ "/bin/sh", "-c", "${JDK_HOME}/bin/java ${JVM_OPTS} -D@environment.systemProperty@=${OPENEASE_ENV} -Dlog4j2.configurationFile=log4j2-${OPENEASE_ENV}.yaml -jar ${OPENEASE_HOME}/@project.build.finalName@-exec.@project.packaging@" ]
+CMD [ "/bin/sh", "-c", "${JDK_HOME}/bin/java ${JVM_OPTS} -D@environment.systemProperty@=${OPENEASE_ENV} -Dlog4j2.configurationFile=log4j2-${OPENEASE_ENV}.yaml -jar ${OPENEASE_HOME}/@project.build.finalName@-@classifier.executable@.@project.packaging@" ]

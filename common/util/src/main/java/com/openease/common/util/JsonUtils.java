@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.jayway.jsonpath.JsonPath;
 import com.openease.common.util.exception.GeneralUtilException;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +33,9 @@ public final class JsonUtils {
    * @return {@link ObjectMapper}
    */
   private static ObjectMapper createObjectMapper() {
-    return new ObjectMapper().enable(ALLOW_UNQUOTED_FIELD_NAMES);
+    return new ObjectMapper()
+        .enable(ALLOW_UNQUOTED_FIELD_NAMES)
+        .findAndRegisterModules();
   }
 
   /**
@@ -45,7 +50,7 @@ public final class JsonUtils {
   }
 
   /**
-   * Serialize from Object to JSON
+   * Serialize from {@link Object} to JSON
    *
    * @param object      object to serialize
    * @param prettyPrint whether to show the output in a human-readable format
@@ -57,7 +62,7 @@ public final class JsonUtils {
   }
 
   /**
-   * Serialize from Object to JSON
+   * Serialize from {@link Object} to JSON
    *
    * @param object object to serialize
    *
@@ -68,7 +73,7 @@ public final class JsonUtils {
   }
 
   /**
-   * Serialize from Object to JSON using mix-in
+   * Serialize from {@link Object} to JSON using mix-in
    *
    * @param object      object to serialize
    * @param prettyPrint whether to show the output in a human-readable format
@@ -84,7 +89,7 @@ public final class JsonUtils {
   }
 
   /**
-   * Serialize from Object to JSON using mix-in
+   * Serialize from {@link Object} to JSON using mix-in
    *
    * @param object              object to serialize
    * @param prettyPrint         whether to show the output in a human-readable format
@@ -101,7 +106,7 @@ public final class JsonUtils {
   }
 
   /**
-   * Serialize from Object to JSON using mix-in
+   * Serialize from {@link Object} to JSON using mix-in
    *
    * @param object     object to serialize
    * @param mixInClass mix-in class to be used
@@ -113,7 +118,7 @@ public final class JsonUtils {
   }
 
   /**
-   * De-serialize from JSON to Object
+   * De-serialize from JSON to {@link Object}
    *
    * @param json  JSON string
    * @param clazz class to de-serialize to
@@ -137,7 +142,25 @@ public final class JsonUtils {
   }
 
   /**
-   * De-serialize from JSON to a {@link List} of Objects
+   * De-serialize from {@link Reader} to {@link Object}
+   *
+   * @param reader reader
+   * @param clazz  class to de-serialize to
+   * @param <T>    type of class
+   *
+   * @return JSON de-serialized into object
+   */
+  public static <T> T toObject(Reader reader, Class<T> clazz) throws IOException {
+    LOG.trace("Converting {}", Reader.class::getSimpleName);
+
+    String json = IOUtils.toString(reader);
+    reader.close();
+
+    return toObject(json, clazz);
+  }
+
+  /**
+   * De-serialize from JSON to a {@link List} of {@link Object}s
    *
    * @param json  JSON string
    * @param clazz class to de-serialize to

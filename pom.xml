@@ -52,6 +52,8 @@
     <project.build.locale>en_US</project.build.locale>
     <test.unit.skipTests>false</test.unit.skipTests>
     <test.integration.skipTests>false</test.integration.skipTests>
+    <classifier.executable>exec</classifier.executable>
+    <classifier.deployable>deploy</classifier.deployable>
 
     <!-- # run-time params -->
     <environment.systemProperty>com.openease.env</environment.systemProperty>
@@ -707,18 +709,6 @@
       <id>jboss-releases</id>
       <name>JBoss - Releases</name>
       <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>jfrog-releases</id>
-      <name>JFrog - Releases</name>
-      <url>https://repo.jfrog.org/artifactory/libs-releases/</url>
       <releases>
         <enabled>true</enabled>
       </releases>

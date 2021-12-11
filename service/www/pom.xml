@@ -43,8 +43,45 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-client</artifactId>
+    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.springframework.boot</groupId>-->
+<!--      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>org.springframework.security.oauth</groupId>-->
+<!--      <artifactId>spring-security-oauth2</artifactId>-->
+<!--      <version>2.5.1.RELEASE</version>-->
+<!--    </dependency>-->
+
+    <!-- #TODO: switch to this -->
+<!--    <dependency>-->
+<!--      <groupId>org.springframework.security</groupId>-->
+<!--      <artifactId>spring-security-jwt</artifactId>-->
+<!--      <version>1.1.1.RELEASE</version>-->
+<!--    </dependency>-->
 
     <!-- # Misc -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>0.11.2</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>0.11.2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>0.11.2</version>
+      <scope>runtime</scope>
+    </dependency>
 
   </dependencies>
 
@@ -65,7 +102,7 @@
           <execution>
             <id>repackage</id>
             <configuration>
-              <classifier>exec</classifier>
+              <classifier>${classifier.executable}</classifier>
             </configuration>
           </execution>
         </executions>
@@ -75,7 +112,7 @@
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <configuration>
-          <nodeVersion>v14.16.1</nodeVersion>
+          <nodeVersion>v16.13.1</nodeVersion>
           <installDirectory>${project.build.directory}</installDirectory>
           <workingDirectory>${project.build.directory}/javascript</workingDirectory>
         </configuration>

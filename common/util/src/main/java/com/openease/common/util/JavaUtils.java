@@ -1,7 +1,10 @@
 package com.openease.common.util;
 
 import com.openease.common.util.exception.GeneralUtilException;
+import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.Serializable;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -100,6 +103,14 @@ public final class JavaUtils {
     return array == null
         ? (T[]) new Object[]{}
         : array;
+  }
+
+  public static String serialize(Serializable object) {
+    return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(object));
+  }
+
+  public static <T> T deserialize(String string, Class<T> clazz) {
+    return clazz.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(string)));
   }
 
 }
