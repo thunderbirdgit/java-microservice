@@ -407,8 +407,12 @@ public class Config {
 
   public static class Auth {
     private String tokenSecret;
-    private long tokenExpirationMilliseconds;
+    private long tokenExpirationSeconds;
     private OAuth2 oAuth2;
+
+    public Auth() {
+      this.tokenExpirationSeconds = 0;
+    }
 
     public String getTokenSecret() {
       return tokenSecret;
@@ -419,12 +423,12 @@ public class Config {
       return this;
     }
 
-    public long getTokenExpirationMilliseconds() {
-      return tokenExpirationMilliseconds;
+    public long getTokenExpirationSeconds() {
+      return tokenExpirationSeconds;
     }
 
-    public Auth setTokenExpirationMilliseconds(long tokenExpirationMilliseconds) {
-      this.tokenExpirationMilliseconds = tokenExpirationMilliseconds;
+    public Auth setTokenExpirationSeconds(long tokenExpirationSeconds) {
+      this.tokenExpirationSeconds = tokenExpirationSeconds;
       return this;
     }
 

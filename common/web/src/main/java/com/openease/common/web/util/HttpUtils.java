@@ -35,7 +35,6 @@ public final class HttpUtils {
 
   private static final transient Logger LOG = LogManager.getLogger(HttpUtils.class);
 
-  public static final String CHARSET_UTF_8_VALUE = "UTF-8";
   public static final String HTTP_HEADER_X_REAL_IP = "X-Real-IP";
 
   private static UserAgentParser USER_AGENT_PARSER;

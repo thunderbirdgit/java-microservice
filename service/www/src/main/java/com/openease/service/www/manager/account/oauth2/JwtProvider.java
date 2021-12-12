@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 
 import static com.openease.common.util.JsonUtils.toJson;
@@ -63,7 +64,8 @@ public class JwtProvider {
     if (username != null) {
       long now = System.currentTimeMillis();
       Date nowDate = new Date(now);
-      Date expiryDate = new Date(now + config.getAuth().getTokenExpirationMilliseconds());
+      long expiry = now + Duration.ofSeconds(config.getAuth().getTokenExpirationSeconds()).toMillis();
+      Date expiryDate = new Date(expiry);
       byte[] keyBytes = Decoders.BASE64.decode(config.getAuth().getTokenSecret());
       Key key = Keys.hmacShaKeyFor(keyBytes);
       token = Jwts.builder()

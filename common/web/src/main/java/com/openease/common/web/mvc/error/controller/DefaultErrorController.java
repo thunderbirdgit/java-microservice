@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import static com.openease.common.util.JsonUtils.toJson;
 import static com.openease.common.web.mvc.base.exception.MvcException.DEFAULT_ERROR_HTTP_STATUS;
 import static com.openease.common.web.mvc.error.controller.DefaultErrorController.ERROR_CONTEXT;
-import static com.openease.common.web.util.HttpUtils.CHARSET_UTF_8_VALUE;
+import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.startsWith;
@@ -49,7 +49,7 @@ public class DefaultErrorController extends BaseMvcController implements ErrorCo
     LOG.debug("Init finished");
   }
 
-  @GetMapping(path = {"", "/"}, produces = TEXT_PLAIN_VALUE + ";charset=" + CHARSET_UTF_8_VALUE)
+  @GetMapping(path = {"", "/"}, produces = TEXT_PLAIN_VALUE + ";charset=" + UTF_8)
   public ResponseEntity<String> handle(HttpServletRequest httpRequest) {
     // defaults
     int code = DEFAULT_ERROR_HTTP_STATUS.value();

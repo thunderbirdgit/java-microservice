@@ -79,6 +79,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     String targetUrl = determineTargetUrl(httpRequest, httpResponse, authentication);
+    LOG.debug("target URL: {}", () -> targetUrl);
 
     if (httpResponse.isCommitted()) {
       LOG.debug("Response has already been committed. Unable to redirect to: {}", () -> targetUrl);

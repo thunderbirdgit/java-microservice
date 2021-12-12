@@ -27,8 +27,8 @@ import static com.openease.common.manager.template.TemplateManager.TEMPLATE_MODE
 import static com.openease.common.manager.template.TemplateManager.TEMPLATE_MODEL_FIRSTNAME;
 import static com.openease.common.manager.template.TemplateManager.TEMPLATE_MODEL_LASTNAME;
 import static com.openease.common.manager.template.TemplateManager.TEMPLATE_MODEL_SUBJECT;
-import static com.openease.common.web.util.HttpUtils.CHARSET_UTF_8_VALUE;
 import static com.openease.service.www.mvc.templates.TemplatesController.TEMPLATES_CONTEXT;
+import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -73,12 +73,12 @@ public class TemplatesController extends BaseMvcController {
     LOG.debug("Init finished");
   }
 
-  @GetMapping(path = {"/{templatePath1}" + SUFFIX_TXT, "/{templatePath1}/{templatePath2}" + SUFFIX_TXT}, produces = TEXT_PLAIN_VALUE + ";charset=" + CHARSET_UTF_8_VALUE)
+  @GetMapping(path = {"/{templatePath1}" + SUFFIX_TXT, "/{templatePath1}/{templatePath2}" + SUFFIX_TXT}, produces = TEXT_PLAIN_VALUE + ";charset=" + UTF_8)
   public String renderTextTemplate(@PathVariable String templatePath1, @PathVariable(required = false) String templatePath2) {
     return renderTemplate(templatePath1, templatePath2, SUFFIX_TXT);
   }
 
-  @GetMapping(path = {"/{templatePath1}" + SUFFIX_HTML, "/{templatePath1}/{templatePath2}" + SUFFIX_HTML}, produces = TEXT_HTML_VALUE + ";charset=" + CHARSET_UTF_8_VALUE)
+  @GetMapping(path = {"/{templatePath1}" + SUFFIX_HTML, "/{templatePath1}/{templatePath2}" + SUFFIX_HTML}, produces = TEXT_HTML_VALUE + ";charset=" + UTF_8)
   public String renderHtmlTemplate(@PathVariable String templatePath1, @PathVariable(required = false) String templatePath2) {
     return renderTemplate(templatePath1, templatePath2, SUFFIX_HTML);
   }
