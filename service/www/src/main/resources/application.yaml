@@ -147,8 +147,9 @@ config:
     max-age-seconds: 3600
 
   auth:
-    token-secret: "@buildNumber@@buildNumber@@buildNumber@"
-    token-expiration-seconds: 864000
+    jwt-signature-algorithm: "HS512"
+    jwt-secret-base64: "@buildNumber@@buildNumber@@buildNumber@"
+    jwt-expiration-seconds: 864000
     oauth2:
       # After successfully authenticating with the OAuth 2.0 Provider, we will be
       # generating an auth token for the user and sending the token to the

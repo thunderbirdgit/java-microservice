@@ -5,7 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -63,16 +62,14 @@ public class JwtProvider {
 
     if (username != null) {
       long now = System.currentTimeMillis();
-      Date nowDate = new Date(now);
-      long expiry = now + Duration.ofSeconds(config.getAuth().getTokenExpirationSeconds()).toMillis();
-      Date expiryDate = new Date(expiry);
-      byte[] keyBytes = Decoders.BASE64.decode(config.getAuth().getTokenSecret());
+      long expiry = now + Duration.ofSeconds(config.getAuth().getJwtExpirationSeconds()).toMillis();
+      byte[] keyBytes = Decoders.BASE64.decode(config.getAuth().getJwtSecretBase64());
       Key key = Keys.hmacShaKeyFor(keyBytes);
       token = Jwts.builder()
           .setSubject(username)
-          .setIssuedAt(nowDate)
-          .setExpiration(expiryDate)
-          .signWith(key, SignatureAlgorithm.HS512)
+          .setIssuedAt(new Date(now))
+          .setExpiration(new Date(expiry))
+          .signWith(key, config.getAuth().getJwtSignatureAlgorithm())
           .compact();
     }
 
@@ -81,7 +78,7 @@ public class JwtProvider {
 
   public String getUsernameFromToken(String token) {
     Claims claims = Jwts.parserBuilder()
-        .setSigningKey(config.getAuth().getTokenSecret())
+        .setSigningKey(config.getAuth().getJwtSecretBase64())
         .build()
         .parseClaimsJws(token)
         .getBody();
@@ -89,26 +86,29 @@ public class JwtProvider {
   }
 
   public boolean validateJwt(String jwt) {
+    boolean jwtValid = false;
+
     if (isNotBlank(jwt)) {
       try {
         Jwts.parserBuilder()
-            .setSigningKey(config.getAuth().getTokenSecret())
+            .setSigningKey(config.getAuth().getJwtSecretBase64())
             .build()
             .parseClaimsJws(jwt);
-        return true;
-      } catch (SignatureException ex) {
-        LOG.error("Invalid JWT signature");
-      } catch (MalformedJwtException ex) {
-        LOG.error("Invalid JWT");
-      } catch (ExpiredJwtException ex) {
-        LOG.error("Expired JWT");
-      } catch (UnsupportedJwtException ex) {
-        LOG.error("Unsupported JWT");
-      } catch (IllegalArgumentException ex) {
-        LOG.error("JWT claims string is empty");
+        jwtValid = true;
+      } catch (SignatureException e) {
+        LOG.error("Invalid JWT signature: {}", e::getLocalizedMessage);
+      } catch (MalformedJwtException e) {
+        LOG.error("Invalid JWT: {}", e::getLocalizedMessage);
+      } catch (ExpiredJwtException e) {
+        LOG.error("Expired JWT: {}", e::getLocalizedMessage);
+      } catch (UnsupportedJwtException e) {
+        LOG.error("Unsupported JWT: {}", e::getLocalizedMessage);
+      } catch (IllegalArgumentException e) {
+        LOG.error("JWT claims string is empty: {}", e::getLocalizedMessage);
       }
     }
-    return false;
+
+    return jwtValid;
   }
 
 }

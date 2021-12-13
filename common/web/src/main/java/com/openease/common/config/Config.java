@@ -2,6 +2,7 @@ package com.openease.common.config;
 
 import com.openease.common.Env;
 import com.openease.common.web.api.ApiVersion;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -406,29 +407,39 @@ public class Config {
   }
 
   public static class Auth {
-    private String tokenSecret;
-    private long tokenExpirationSeconds;
+    private SignatureAlgorithm jwtSignatureAlgorithm;
+    private String jwtSecretBase64;
+    private long jwtExpirationSeconds;
     private OAuth2 oAuth2;
 
     public Auth() {
-      this.tokenExpirationSeconds = 0;
+      this.jwtExpirationSeconds = 0;
     }
 
-    public String getTokenSecret() {
-      return tokenSecret;
+    public SignatureAlgorithm getJwtSignatureAlgorithm() {
+      return jwtSignatureAlgorithm;
     }
 
-    public Auth setTokenSecret(String tokenSecret) {
-      this.tokenSecret = tokenSecret;
+    public Auth setJwtSignatureAlgorithm(SignatureAlgorithm jwtSignatureAlgorithm) {
+      this.jwtSignatureAlgorithm = jwtSignatureAlgorithm;
       return this;
     }
 
-    public long getTokenExpirationSeconds() {
-      return tokenExpirationSeconds;
+    public String getJwtSecretBase64() {
+      return jwtSecretBase64;
     }
 
-    public Auth setTokenExpirationSeconds(long tokenExpirationSeconds) {
-      this.tokenExpirationSeconds = tokenExpirationSeconds;
+    public Auth setJwtSecretBase64(String jwtSecretBase64) {
+      this.jwtSecretBase64 = jwtSecretBase64;
+      return this;
+    }
+
+    public long getJwtExpirationSeconds() {
+      return jwtExpirationSeconds;
+    }
+
+    public Auth setJwtExpirationSeconds(long jwtExpirationSeconds) {
+      this.jwtExpirationSeconds = jwtExpirationSeconds;
       return this;
     }
 
