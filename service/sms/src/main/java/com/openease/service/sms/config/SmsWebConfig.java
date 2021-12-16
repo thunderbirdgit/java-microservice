@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 @EnableWebMvc
-@DependsOn({"smsDataConfig", "smsSecurityConfig"})
+@DependsOn({"smsDataConfig"})
 public class SmsWebConfig extends BaseWebConfig {
 
   private static final transient Logger LOG = LogManager.getLogger(SmsWebConfig.class);

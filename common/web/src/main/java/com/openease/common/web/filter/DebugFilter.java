@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.openease.common.util.JsonUtils.toJson;
-import static com.openease.common.web.security.BaseSecurityConfig.getSignedInAccount;
+import static com.openease.common.web.security.BaseAuthSecurityConfig.getSignedInAccount;
 import static com.openease.common.web.util.HttpUtils.getHeadersAsString;
 import static com.openease.common.web.util.HttpUtils.getIpAddress;
 import static com.openease.common.web.util.HttpUtils.getUserAgentDetails;

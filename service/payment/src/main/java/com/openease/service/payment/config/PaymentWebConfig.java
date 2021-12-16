@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 @EnableWebMvc
-@DependsOn({"paymentDataConfig", "paymentSecurityConfig"})
+@DependsOn({"paymentDataConfig"})
 public class PaymentWebConfig extends BaseWebConfig {
 
   private static final transient Logger LOG = LogManager.getLogger(PaymentWebConfig.class);

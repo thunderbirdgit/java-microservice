@@ -1,6 +1,6 @@
 package com.openease.service.www.config;
 
-import com.openease.common.web.security.BaseSecurityConfig;
+import com.openease.common.web.security.BaseAuthSecurityConfig;
 import com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.openease.service.www.manager.account.oauth2.OAuth2AccountManager;
 import com.openease.service.www.manager.account.oauth2.OAuth2AuthenticationFailureHandler;
@@ -30,9 +30,9 @@ import static org.springframework.http.HttpMethod.DELETE;
  */
 @Configuration
 @EnableWebSecurity
-@DependsOn({"wwwDataConfig"})
+@DependsOn({"wwwDataConfig", "wwwWebConfig"})
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WwwSecurityConfig extends BaseSecurityConfig {
+public class WwwSecurityConfig extends BaseAuthSecurityConfig {
 
   private static final transient Logger LOG = LogManager.getLogger(WwwSecurityConfig.class);
 

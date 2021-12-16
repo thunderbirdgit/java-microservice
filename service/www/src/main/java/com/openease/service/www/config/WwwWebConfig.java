@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 @EnableWebMvc
-@DependsOn({"wwwDataConfig", "wwwSecurityConfig"})
+@DependsOn({"wwwDataConfig"})
 public class WwwWebConfig extends BaseWebConfig {
 
   private static final transient Logger LOG = LogManager.getLogger(WwwWebConfig.class);

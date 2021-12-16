@@ -12,6 +12,8 @@ public class SessionCreateResponse extends BaseManagerModel implements HasAccoun
 
   private String accountId;
 
+  private String jwt;
+
   public SessionCreateResponse() {
     this.accountId = null;
   }
@@ -24,6 +26,15 @@ public class SessionCreateResponse extends BaseManagerModel implements HasAccoun
   @Override
   public SessionCreateResponse setAccountId(String accountId) {
     this.accountId = accountId;
+    return this;
+  }
+
+  public String getJwt() {
+    return jwt;
+  }
+
+  public SessionCreateResponse setJwt(String jwt) {
+    this.jwt = jwt;
     return this;
   }
 

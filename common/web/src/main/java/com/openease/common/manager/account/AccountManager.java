@@ -16,6 +16,7 @@ import com.openease.common.manager.task.email.SendNotifyUsernameChangeEmailTask;
 import com.openease.common.manager.task.email.SendResetPasswordEmailTask;
 import com.openease.common.manager.task.email.SendVerifyAccountEmailTask;
 import com.openease.common.manager.task.email.SendWelcomeEmailTask;
+import com.openease.common.util.spring.BeanLocator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,10 +81,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private AuthenticationManager authenticationManager;
-
-//  @Value("${dummy-account.email}")
+  //  @Value("${dummy-account.email}")
 //  private String dummyAccountEmail;
 //
 //  @Value("${dummy-account.first-name}")
@@ -350,29 +348,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     return account;
   }
 
-  @Override
-  public UserDetails updatePassword(UserDetails user, String newPassword) {
-    Account account = null;
-    if (user != null) {
-      account = findByUsername(user.getUsername());
-
-      if (account != null) {
-        AccountUpdatePasswordRequest request = new AccountUpdatePasswordRequest()
-            .setCurrentPassword(null)
-            .setNewPassword(newPassword);
-        try {
-          //TODO: add skip current password verification
-          updatePassword(account, request);
-        } catch (GeneralManagerException me) {
-          LOG.error(me::getMessage, me);
-        }
-      }
-    }
-
-    return account;
-  }
-
-  public void updatePassword(Account account, AccountUpdatePasswordRequest request) throws GeneralManagerException {
+  public void updatePassword(Account account, AccountUpdatePasswordRequest request, boolean skipPasswordVerification) throws GeneralManagerException {
     final Account finalAccount = account;
     LOG.debug("account: {}", () -> (finalAccount == null ? null : finalAccount.toStringUsingMixIn()));
     checkForNullAccount(account);
@@ -383,8 +359,10 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
       throw new GeneralManagerException(CRUD_BADREQUEST, "request is null");
     }
 
-    LOG.debug("Verify current password");
-    verifyPassword(account, request.getCurrentPassword());
+    if (!skipPasswordVerification) {
+      LOG.debug("Verify current password");
+      verifyPassword(account, request.getCurrentPassword());
+    }
 
     LOG.debug("Verify new password is not identical to current password");
     if (StringUtils.equals(request.getCurrentPassword(), request.getNewPassword())) {
@@ -409,6 +387,31 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     }
   }
 
+  @Override
+  public UserDetails updatePassword(UserDetails user, String newPassword) {
+    Account account = null;
+    if (user != null) {
+      account = findByUsername(user.getUsername());
+
+      if (account != null) {
+        AccountUpdatePasswordRequest request = new AccountUpdatePasswordRequest()
+            .setCurrentPassword(null)
+            .setNewPassword(newPassword);
+        try {
+          updatePassword(account, request, true);
+        } catch (GeneralManagerException me) {
+          LOG.error(me::getMessage, me);
+        }
+      }
+    }
+
+    return account;
+  }
+
+  public void updatePassword(Account account, AccountUpdatePasswordRequest request) throws GeneralManagerException {
+    updatePassword(account, request, false);
+  }
+
   public Authentication verifyPassword(Account account, String password) throws GeneralManagerException {
     LOG.debug("account: {}", () -> (account == null ? null : account.toStringUsingMixIn()));
     if (account == null) {
@@ -418,6 +421,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     Authentication authentication;
 
     try {
+      final AuthenticationManager authenticationManager = BeanLocator.byClassAndName(AuthenticationManager.class, "authenticationManager");
       authentication = new UsernamePasswordAuthenticationToken(account, password, account.getAuthorities());
       authentication = authenticationManager.authenticate(authentication);
     } catch (AuthenticationException ae) {

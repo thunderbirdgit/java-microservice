@@ -49,7 +49,7 @@ public class SubscriptionManager {
 
   @Configuration
   @ConfigurationProperties(prefix = "manager.subscription")
-  protected class Config {
+  protected static class Config {
     private List<Plan> plans;
 
     public List<Plan> getPlans() {

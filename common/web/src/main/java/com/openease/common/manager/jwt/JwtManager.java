@@ -1,6 +1,7 @@
-package com.openease.service.www.manager.account.oauth2;
+package com.openease.common.manager.jwt;
 
 import com.openease.common.config.Config;
+import com.openease.common.data.model.account.Account;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.time.Duration;
@@ -24,14 +25,14 @@ import static com.openease.common.util.JsonUtils.toJson;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * JSON Web Token (JWT) provider
+ * JSON Web Token (JWT) manager
  *
  * @author Alan Czajkowski
  */
-@Component
-public class JwtProvider {
+@Service
+public class JwtManager {
 
-  private static final transient Logger LOG = LogManager.getLogger(JwtProvider.class);
+  private static final transient Logger LOG = LogManager.getLogger(JwtManager.class);
 
   @Autowired
   private Config config;
@@ -41,14 +42,17 @@ public class JwtProvider {
 
     String username = null;
     if (authentication == null) {
-      LOG.trace("No authentication JWT in session");
+      LOG.trace("No authentication provided");
     } else {
       LOG.debug("{} is of type: {}", Authentication.class::getSimpleName, () -> authentication.getClass().getSimpleName());
       Object principal = authentication.getPrincipal();
       if (principal != null) {
         LOG.debug("{}.principal is of type: {}", () -> authentication.getClass().getSimpleName(), () -> principal.getClass().getSimpleName());
-        //TODO: this is GOOGLE
-        if (principal instanceof DefaultOidcUser) {
+        if (principal instanceof Account) { // local account
+          Account account = (Account) principal;
+          username = account.getUsername();
+          LOG.trace("{}: {}", () -> account.getClass().getSimpleName(), account::toStringUsingMixIn);
+        } else if (principal instanceof DefaultOidcUser) {  // Google account
           DefaultOidcUser oidcUser = (DefaultOidcUser) principal;
           username = oidcUser.getEmail();
           LOG.trace("{}: {}", () -> oidcUser.getClass().getSimpleName(), () -> toJson(oidcUser, true));
@@ -66,6 +70,7 @@ public class JwtProvider {
       byte[] keyBytes = Decoders.BASE64.decode(config.getAuth().getJwtSecretBase64());
       Key key = Keys.hmacShaKeyFor(keyBytes);
       token = Jwts.builder()
+          // set JWT Claims sub (subject) value
           .setSubject(username)
           .setIssuedAt(new Date(now))
           .setExpiration(new Date(expiry))
@@ -76,11 +81,11 @@ public class JwtProvider {
     return token;
   }
 
-  public String getUsernameFromToken(String token) {
+  public String getUsernameFromJwt(String jwt) {
     Claims claims = Jwts.parserBuilder()
         .setSigningKey(config.getAuth().getJwtSecretBase64())
         .build()
-        .parseClaimsJws(token)
+        .parseClaimsJws(jwt)
         .getBody();
     return claims.getSubject();
   }

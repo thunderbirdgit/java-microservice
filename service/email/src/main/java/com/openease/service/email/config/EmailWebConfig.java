@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 @EnableWebMvc
-@DependsOn({"emailDataConfig", "emailSecurityConfig"})
+@DependsOn({"emailDataConfig"})
 public class EmailWebConfig extends BaseWebConfig {
 
   private static final transient Logger LOG = LogManager.getLogger(EmailWebConfig.class);

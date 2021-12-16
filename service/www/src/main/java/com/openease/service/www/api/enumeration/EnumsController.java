@@ -1,6 +1,7 @@
 package com.openease.service.www.api.enumeration;
 
 import com.openease.common.data.model.account.Gender;
+import com.openease.common.data.model.account.OAuth2Provider;
 import com.openease.common.data.model.account.Tier;
 import com.openease.common.web.api.ApiVersion;
 import com.openease.common.web.api.base.BaseApiController;
@@ -41,6 +42,7 @@ public class EnumsController extends BaseApiController {
   public static final String[] ENDPOINTS = {
       ENUMS_CONTEXT + "/api-versions",
       ENUMS_CONTEXT + "/regions",
+      ENUMS_CONTEXT + "/oauth2/providers",
       ENUMS_CONTEXT + "/account/genders",
       ENUMS_CONTEXT + "/account/tiers",
       ENUMS_CONTEXT + "/account/subscription/plans"
@@ -73,6 +75,13 @@ public class EnumsController extends BaseApiController {
   @GetMapping(path = "/regions")
   public SuccessApiResponse<List<Map<String, Object>>> getRegions() {
     SuccessApiResponse<List<Map<String, Object>>> response = ApiUtils.createSuccessApiResponse(Region.regions());
+    LOG.debug("response: {}", response);
+    return response;
+  }
+
+  @GetMapping(path = "/oauth2/providers")
+  public SuccessApiResponse<OAuth2Provider[]> getOAuth2Providers() {
+    SuccessApiResponse<OAuth2Provider[]> response = ApiUtils.createSuccessApiResponse(OAuth2Provider.values());
     LOG.debug("response: {}", response);
     return response;
   }

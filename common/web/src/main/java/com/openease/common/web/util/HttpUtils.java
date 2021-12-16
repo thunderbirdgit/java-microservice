@@ -161,6 +161,7 @@ public final class HttpUtils {
         if (cookie.getName().equals(name)) {
           cookie.setValue(EMPTY);
           cookie.setPath("/");
+          // zero value causes the cookie to be deleted
           cookie.setMaxAge(0);
           httpResponse.addCookie(cookie);
         }

@@ -2,6 +2,7 @@ package com.openease.service.www.manager.account.oauth2;
 
 import com.openease.common.config.Config;
 import com.openease.common.data.model.account.OAuth2Provider;
+import com.openease.common.manager.jwt.JwtManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
   private OAuth2AccountManager oAuth2AccountManager;
 
   @Autowired
-  private JwtProvider jwtProvider;
+  private JwtManager jwtManager;
 
   @Autowired
   private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
@@ -100,7 +101,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-    String jwt = jwtProvider.createJwt(authentication);
+    //TODO: throw GeneralManagerException
+    String jwt = jwtManager.createJwt(authentication);
     if (jwt == null) {
       throw new RuntimeException("Sorry! Unable to create JWT");
     }

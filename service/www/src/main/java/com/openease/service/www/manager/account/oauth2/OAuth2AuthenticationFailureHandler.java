@@ -14,9 +14,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import static com.openease.common.web.util.HttpUtils.getCookie;
 import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * OAuth 2.0 {@link AuthenticationFailureHandler}
@@ -41,8 +43,11 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
         .orElse(("/"));
 
     redirectUrl = UriComponentsBuilder.fromUriString(redirectUrl)
-        .queryParam("error", exception.getLocalizedMessage())
+        .queryParam("error", URLEncoder.encode(exception.getLocalizedMessage(), UTF_8.toString()))
         .build().toUriString();
+
+    String finalRedirectUrl = redirectUrl;
+    LOG.debug("redirect URL: {}", () -> finalRedirectUrl);
 
     httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(httpRequest, httpResponse);
 

@@ -2,6 +2,7 @@ package com.openease.service.www.manager.account.oauth2;
 
 import com.openease.common.data.model.account.Account;
 import com.openease.common.manager.account.AccountManager;
+import com.openease.common.manager.jwt.JwtManager;
 import com.openease.common.manager.session.SessionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   public static final String HTTP_HEADER_AUTHORIZATION_PREFIX = "Bearer ";
 
   @Autowired
-  private JwtProvider jwtProvider;
+  private JwtManager jwtManager;
 
   @Autowired
   private AccountManager accountManager;
@@ -51,9 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String jwt = getJwtFromHttpRequest(httpRequest);
       LOG.trace("JWT from HTTP request: {}", () -> jwt);
 
-      if (jwtProvider.validateJwt(jwt)) {
+      if (jwtManager.validateJwt(jwt)) {
         LOG.debug("JWT is valid");
-        String username = jwtProvider.getUsernameFromToken(jwt);
+        String username = jwtManager.getUsernameFromJwt(jwt);
         LOG.debug("JWT contains username: {}", () -> username);
 
         Account account = accountManager.findByUsername(username);

@@ -25,7 +25,7 @@ import static com.openease.common.data.lang.MessageKeys.CRUD_DELETE_SUCCESS;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_CREDENTIALS_INVALID;
 import static com.openease.common.manager.session.SessionManager.SESSIONS;
 import static com.openease.common.util.JsonUtils.toJson;
-import static com.openease.common.web.security.BaseSecurityConfig.getSignedInAccount;
+import static com.openease.common.web.security.BaseAuthSecurityConfig.getSignedInAccount;
 import static com.openease.common.web.util.ApiUtils.createSuccessApiResponse;
 import static com.openease.service.www.api.sessions.SessionsController.SESSIONS_CONTEXT;
 import static org.springframework.http.HttpStatus.CREATED;

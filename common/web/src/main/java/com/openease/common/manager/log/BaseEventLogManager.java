@@ -104,7 +104,7 @@ public abstract class BaseEventLogManager implements EventLogManager {
           : account.getId();
       eventLog = create(httpRequest, description, toJson(getHeadersAsMap(httpRequest)), accountId);
     } else {
-      LOG.warn("{} disabled, ignoring create({})", EventLogManager.class::getSimpleName, HttpServletRequest.class::getSimpleName);
+      LOG.warn("{} disabled, ignoring create(...)", EventLogManager.class::getSimpleName);
     }
 
     return eventLog;
