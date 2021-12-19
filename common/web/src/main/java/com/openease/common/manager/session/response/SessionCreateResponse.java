@@ -10,12 +10,22 @@ import com.openease.common.manager.base.model.BaseManagerModel;
  */
 public class SessionCreateResponse extends BaseManagerModel implements HasAccountId<SessionCreateResponse> {
 
-  private String accountId;
-
   private String jwt;
 
+  private String accountId;
+
   public SessionCreateResponse() {
+    this.jwt = null;
     this.accountId = null;
+  }
+
+  public String getJwt() {
+    return jwt;
+  }
+
+  public SessionCreateResponse setJwt(String jwt) {
+    this.jwt = jwt;
+    return this;
   }
 
   @Override
@@ -26,15 +36,6 @@ public class SessionCreateResponse extends BaseManagerModel implements HasAccoun
   @Override
   public SessionCreateResponse setAccountId(String accountId) {
     this.accountId = accountId;
-    return this;
-  }
-
-  public String getJwt() {
-    return jwt;
-  }
-
-  public SessionCreateResponse setJwt(String jwt) {
-    this.jwt = jwt;
     return this;
   }
 

@@ -1,4 +1,4 @@
-package com.openease.service.www.manager.account.oauth2;
+package com.openease.common.web.filter;
 
 import com.openease.common.data.model.account.Account;
 import com.openease.common.manager.account.AccountManager;
@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -18,9 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.openease.common.web.util.HttpUtils.deleteCookie;
-import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME;
-import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -33,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private static final transient Logger LOG = LogManager.getLogger(JwtAuthenticationFilter.class);
 
-  public static final String HTTP_HEADER_AUTHORIZATION_PREFIX = "Bearer ";
+  public static final String HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX = "Bearer ";
 
   @Autowired
   private JwtManager jwtManager;
@@ -60,22 +57,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Account account = accountManager.findByUsername(username);
         LOG.debug("account: {}", () -> (account == null ? null : account.toStringUsingMixIn()));
         if (account != null) {
+          LOG.debug("Update security context with new authentication");
           AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
-          authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-          sessionManager.updateSecurityContext(authentication);
+          //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+          LOG.trace("Updating authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
+          SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-          LOG.debug("Deleting cookie: {}", () -> OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-          deleteCookie(httpRequest, httpResponse, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-          LOG.debug("Deleting cookie: {}", () -> REDIRECT_URI_PARAM_COOKIE_NAME);
-          deleteCookie(httpRequest, httpResponse, REDIRECT_URI_PARAM_COOKIE_NAME);
-          sessionManager.updateSecurityContext(null);
+          LOG.trace("Updating authentication in security context: null");
+          SecurityContextHolder.getContext().setAuthentication(null);
         }
       } else {
-        LOG.debug("Deleting cookie: {}", () -> OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-        deleteCookie(httpRequest, httpResponse, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-        LOG.debug("Deleting cookie: {}", () -> REDIRECT_URI_PARAM_COOKIE_NAME);
-        deleteCookie(httpRequest, httpResponse, REDIRECT_URI_PARAM_COOKIE_NAME);
-        sessionManager.updateSecurityContext(null);
+        LOG.trace("Updating authentication in security context: null");
+        SecurityContextHolder.getContext().setAuthentication(null);
       }
     } catch (Exception e) {
       LOG.error("Could not set user authentication in security context", e);
@@ -87,9 +80,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private String getJwtFromHttpRequest(HttpServletRequest httpRequest) {
     String jwt = null;
 
-    String bearerToken = httpRequest.getHeader(AUTHORIZATION);
-    if (startsWithIgnoreCase(bearerToken, HTTP_HEADER_AUTHORIZATION_PREFIX)) {
-      jwt = bearerToken.substring(HTTP_HEADER_AUTHORIZATION_PREFIX.length());
+    String authorizationHeaderValue = httpRequest.getHeader(AUTHORIZATION);
+    if (startsWithIgnoreCase(authorizationHeaderValue, HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX)) {
+      jwt = authorizationHeaderValue.substring(HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX.length());
     }
 
     return jwt;

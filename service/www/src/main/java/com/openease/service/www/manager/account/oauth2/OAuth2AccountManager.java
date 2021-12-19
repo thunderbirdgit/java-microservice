@@ -134,9 +134,7 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
         } else {
           LOG.debug("account: {}", account::toStringUsingMixIn);
           LOG.debug("Local account with username (email) [{}] already exists, updating account OAuth 2.0 information ...", () -> username);
-          account.getOAuth2()
-              .setProvider(oAuth2Account.getOAuth2().getProvider())
-              .setUserAttributes(oAuth2Account.getOAuth2().getUserAttributes());
+          account.setOAuth2(oAuth2Account.getOAuth2());
           try {
             LOG.debug("oAuth2Account: {}", account::toStringUsingMixIn);
             Account updatedAccount = accountManager.update(account);

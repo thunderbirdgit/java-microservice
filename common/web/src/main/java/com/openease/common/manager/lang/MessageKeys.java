@@ -61,6 +61,10 @@ public class MessageKeys {
   /**
    * Messages for {@link com.openease.common.manager.account.AccountManager}
    */
+  public static final String MANAGER_ACCOUNT_DISABLED =
+      "manager.account.disabled";
+  public static final String MANAGER_ACCOUNT_LOCKED =
+      "manager.account.locked";
   public static final String MANAGER_ACCOUNT_CREDENTIALS_INVALID =
       "manager.account.credentials.invalid";
   public static final String MANAGER_ACCOUNT_PASSWORDS_IDENTICAL =

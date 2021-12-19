@@ -10,7 +10,8 @@ import com.openease.common.web.security.BaseAuthSecurityConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -63,8 +64,13 @@ public class SessionManager {
 
     LOG.debug("Signing-in account username: [{}]", request::getUsername);
     Account account = accountManager.findByUsername(request.getUsername());
-    Authentication authentication = accountManager.verifyPassword(account, request.getPassword());
-    updateSecurityContext(authentication);
+    accountManager.verifyPassword(account, request.getPassword());
+
+    LOG.debug("Update security context with new authentication");
+    AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
+    //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+    LOG.trace("Updating authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
     LOG.debug("Creating JWT for account username: [{}]", account::getUsername);
     //TODO: throw GeneralManagerException
@@ -77,8 +83,8 @@ public class SessionManager {
 
     // set response
     response = new SessionCreateResponse()
-        .setAccountId(account.getId())
-        .setJwt(jwt);
+        .setJwt(jwt)
+        .setAccountId(account.getId());
 
     LOG.debug("response: {}", response);
     return response;
@@ -89,7 +95,8 @@ public class SessionManager {
    */
   public void delete() {
     LOG.debug("Signing-out account username: [{}]", BaseAuthSecurityConfig::getSignedInUsername);
-    updateSecurityContext(null);
+    LOG.trace("Updating authentication in security context: null");
+    SecurityContextHolder.getContext().setAuthentication(null);
   }
 
   public Account getSignedInAccount() {
@@ -102,11 +109,6 @@ public class SessionManager {
     return account == null
         ? null
         : account.getId();
-  }
-
-  public void updateSecurityContext(Authentication authentication) {
-    LOG.trace("Setting authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
-    SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
 }

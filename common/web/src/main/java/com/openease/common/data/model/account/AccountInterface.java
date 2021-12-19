@@ -73,6 +73,10 @@ public interface AccountInterface<ACCOUNT extends AccountInterface> {
 
   ACCOUNT setImageUrl(String imageUrl);
 
+  OAuth2 getOAuth2();
+
+  ACCOUNT setOAuth2(OAuth2 oAuth2);
+
   Date getCreated();
 
   ACCOUNT setCreated(Date created);

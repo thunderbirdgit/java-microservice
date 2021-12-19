@@ -105,10 +105,10 @@ public class Account extends BaseAuditDataModel<Account> implements AccountInter
 
   private String companyName;
 
+  private String imageUrl;
+
   @Field(type = FieldType.Object)
   private OAuth2 oAuth2;
-
-  private String imageUrl;
 
   public Account() {
     this(null);
@@ -142,8 +142,8 @@ public class Account extends BaseAuditDataModel<Account> implements AccountInter
     this.lastName = null;
     this.gender = UNKNOWN;
     this.companyName = null;
-    this.oAuth2 = null;
     this.imageUrl = null;
+    this.oAuth2 = null;
   }
 
   @Override
@@ -413,21 +413,25 @@ public class Account extends BaseAuditDataModel<Account> implements AccountInter
     return this;
   }
 
-  public OAuth2 getOAuth2() {
-    return oAuth2;
-  }
-
-  public Account setOAuth2(OAuth2 oAuth2) {
-    this.oAuth2 = oAuth2;
-    return this;
-  }
-
+  @Override
   public String getImageUrl() {
     return imageUrl;
   }
 
+  @Override
   public Account setImageUrl(String imageUrl) {
     this.imageUrl = imageUrl;
+    return this;
+  }
+
+  @Override
+  public OAuth2 getOAuth2() {
+    return oAuth2;
+  }
+
+  @Override
+  public Account setOAuth2(OAuth2 oAuth2) {
+    this.oAuth2 = oAuth2;
     return this;
   }
 

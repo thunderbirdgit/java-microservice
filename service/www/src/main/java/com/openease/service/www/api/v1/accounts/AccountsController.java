@@ -8,7 +8,9 @@ import com.openease.common.manager.account.request.AccountCreateRequest;
 import com.openease.common.manager.account.request.AccountResetPasswordRequest;
 import com.openease.common.manager.account.request.AccountSendPasswordResetCodeRequest;
 import com.openease.common.manager.account.request.AccountUpdatePasswordRequest;
+import com.openease.common.manager.account.response.AccountUpdateResponse;
 import com.openease.common.manager.exception.GeneralManagerException;
+import com.openease.common.manager.jwt.JwtManager;
 import com.openease.common.manager.session.SessionManager;
 import com.openease.common.web.api.base.BaseApiController;
 import com.openease.common.web.api.base.exception.ApiException;
@@ -17,7 +19,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,13 +44,14 @@ import static com.openease.common.data.lang.MessageKeys.CRUD_UPDATE_SUCCESS;
 import static com.openease.common.data.model.account.Account.ACCOUNTS;
 import static com.openease.common.data.model.base.BaseDataModel.ID_REGEX_RELAXED;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_CREDENTIALS_INVALID;
+import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_DISABLED;
+import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_LOCKED;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_USERNAME_UNAVAILABLE;
 import static com.openease.common.util.JsonUtils.toJson;
 import static com.openease.common.web.api.ApiVersion.Constants.V1_CONTEXT;
 import static com.openease.common.web.util.ApiUtils.checkIdMatch;
 import static com.openease.common.web.util.ApiUtils.createSuccessApiResponse;
 import static com.openease.service.www.api.v1.accounts.AccountsController.ACCOUNTS_CONTEXT;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -75,6 +80,9 @@ public class AccountsController extends BaseApiController {
 
   @Autowired
   private SessionManager sessionManager;
+
+  @Autowired
+  private JwtManager jwtManager;
 
   @PostConstruct
   public void init() {
@@ -149,36 +157,43 @@ public class AccountsController extends BaseApiController {
 
   @PreAuthorize("isAuthenticated()")
   @PutMapping(path = "/{id:" + ID_REGEX_RELAXED + "}")
-  public SuccessApiResponse<AccountScrubbed> update(@PathVariable String id, @RequestBody @Valid AccountScrubbed accountScrubbed, HttpServletRequest httpRequest) {
+  public SuccessApiResponse<AccountUpdateResponse> update(@PathVariable String id, @RequestBody @Valid AccountScrubbed accountScrubbed, HttpServletRequest httpRequest) {
     LOG.trace("id: {}", id);
     LOG.trace("accountScrubbed: {}", () -> (accountScrubbed == null ? null : accountScrubbed.toStringUsingMixIn()));
 
     checkIdMatch(id, sessionManager.getSignedInAccountId());
     checkIdMatch(id, accountScrubbed.getId());
 
-    SuccessApiResponse<AccountScrubbed> response;
+    SuccessApiResponse<AccountUpdateResponse> response;
 
     Account account;
     try {
-      account = accountManager.read(accountScrubbed.getId());
-      boolean usernameChanged = false;
-      if (!equalsIgnoreCase(accountScrubbed.getUsername(), account.getUsername())) {
-        usernameChanged = true;
-        LOG.debug("Account username (email) changed, verify password ...");
-        accountManager.verifyPassword(account, accountScrubbed.getPasswordVerification());
-      }
-
       account = accountManager.update(accountScrubbed);
 
-      if (usernameChanged) {
-        LOG.debug("Update security context with new credentials");
-        Authentication authentication = accountManager.verifyPassword(account, accountScrubbed.getPasswordVerification());
-        sessionManager.updateSecurityContext(authentication);
+      LOG.debug("Update security context with new authentication");
+      AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
+      //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+      LOG.trace("Updating authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+
+      LOG.debug("Creating JWT for account username: [{}]", account::getUsername);
+      //TODO: throw GeneralManagerException
+      String jwt = jwtManager.createJwt(authentication);
+      if (jwt == null) {
+        throw new RuntimeException("Sorry! Unable to create JWT");
       }
 
-      response = createSuccessApiResponse(accountManager.scrub(account), messageSource, CRUD_UPDATE_SUCCESS);
+      AccountUpdateResponse accountUpdateResponse = new AccountUpdateResponse()
+          .setJwt(jwt)
+          .setAccount(accountManager.scrub(account));
+
+      response = createSuccessApiResponse(accountUpdateResponse, messageSource, CRUD_UPDATE_SUCCESS);
     } catch (GeneralManagerException me) {
       switch (me.getKey()) {
+        case MANAGER_ACCOUNT_DISABLED:
+        case MANAGER_ACCOUNT_LOCKED:
+        case MANAGER_ACCOUNT_CREDENTIALS_INVALID:
+          throw new ApiException(FORBIDDEN, me);
         case CRUD_UPDATE_STALE:
           throw new ApiException(CONFLICT, me);
         case CRUD_NOTFOUND:
@@ -251,7 +266,7 @@ public class AccountsController extends BaseApiController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping(path = "/{id:" + ID_REGEX_RELAXED + "}/_updatePassword")
-  public SuccessApiResponse updatePassword(@PathVariable String id, @RequestBody @Valid AccountUpdatePasswordRequest request, HttpServletRequest httpRequest) {
+  public SuccessApiResponse<AccountUpdateResponse> updatePassword(@PathVariable String id, @RequestBody @Valid AccountUpdatePasswordRequest request, HttpServletRequest httpRequest) {
     LOG.trace("request: {}", () -> (request == null ? null : request.toStringUsingMixIn()));
     if (request == null) {
       throw new ApiException();
@@ -259,20 +274,36 @@ public class AccountsController extends BaseApiController {
 
     checkIdMatch(id, sessionManager.getSignedInAccountId());
 
-    SuccessApiResponse response;
+    SuccessApiResponse<AccountUpdateResponse> response;
 
     Account account;
     try {
       account = sessionManager.getSignedInAccount();
       accountManager.updatePassword(account, request);
+      accountManager.verifyPassword(account, request.getNewPassword());
 
-      LOG.debug("Update security context with new credentials");
-      Authentication authentication = accountManager.verifyPassword(account, request.getNewPassword());
-      sessionManager.updateSecurityContext(authentication);
+      LOG.debug("Update security context with new authentication");
+      AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
+      //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+      LOG.trace("Updating authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
+      SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      response = createSuccessApiResponse();
+      LOG.debug("Creating JWT for account username: [{}]", account::getUsername);
+      //TODO: throw GeneralManagerException
+      String jwt = jwtManager.createJwt(authentication);
+      if (jwt == null) {
+        throw new RuntimeException("Sorry! Unable to create JWT");
+      }
+
+      AccountUpdateResponse accountUpdateResponse = new AccountUpdateResponse()
+          .setJwt(jwt)
+          .setAccount(accountManager.scrub(account));
+
+      response = createSuccessApiResponse(accountUpdateResponse, messageSource, CRUD_UPDATE_SUCCESS);
     } catch (GeneralManagerException me) {
       switch (me.getKey()) {
+        case MANAGER_ACCOUNT_DISABLED:
+        case MANAGER_ACCOUNT_LOCKED:
         case MANAGER_ACCOUNT_CREDENTIALS_INVALID:
           throw new ApiException(FORBIDDEN, me);
         case CRUD_NOTFOUND:

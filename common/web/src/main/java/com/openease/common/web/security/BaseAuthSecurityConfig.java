@@ -96,6 +96,7 @@ public abstract class BaseAuthSecurityConfig extends BaseSecurityConfig {
     Account account = null;
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    LOG.trace("Retrieved authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
     if (authentication == null) {
       LOG.trace("No authentication in security context");
     } else {
@@ -105,7 +106,7 @@ public abstract class BaseAuthSecurityConfig extends BaseSecurityConfig {
         LOG.debug("{}.principal is of type: {}", () -> authentication.getClass().getSimpleName(), () -> principal.getClass().getSimpleName());
         if (principal instanceof Account) {
           account = (Account) principal;
-          LOG.trace("account{id: [{}], username: [{}]}", account::getId, account::getUsername);
+          LOG.trace("account: {id: [{}], username: [{}]}", account::getId, account::getUsername);
         } else {
           LOG.warn("{}.principal is *not* of type: {}", () -> authentication.getClass().getSimpleName(), Account.class::getSimpleName);
         }

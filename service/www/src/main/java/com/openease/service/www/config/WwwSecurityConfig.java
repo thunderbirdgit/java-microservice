@@ -1,11 +1,11 @@
 package com.openease.service.www.config;
 
+import com.openease.common.web.filter.JwtAuthenticationFilter;
 import com.openease.common.web.security.BaseAuthSecurityConfig;
 import com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.openease.service.www.manager.account.oauth2.OAuth2AccountManager;
 import com.openease.service.www.manager.account.oauth2.OAuth2AuthenticationFailureHandler;
 import com.openease.service.www.manager.account.oauth2.OAuth2AuthenticationSuccessHandler;
-import com.openease.service.www.manager.account.oauth2.JwtAuthenticationFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

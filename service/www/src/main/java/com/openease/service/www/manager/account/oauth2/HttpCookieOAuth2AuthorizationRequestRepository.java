@@ -30,6 +30,8 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
 
   public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
   public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
+
+  //TODO: move to config
   private static final int COOKIE_MAX_AGE_SECONDS = (int) Duration.ofMinutes(3).toSeconds();
 
   @Override
@@ -62,6 +64,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
 
   @Override
   public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request) {
+    //TODO: fix
     return this.loadAuthorizationRequest(request);
   }
 

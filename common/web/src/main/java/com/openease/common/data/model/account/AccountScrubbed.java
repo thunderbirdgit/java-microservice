@@ -8,6 +8,7 @@ import com.openease.common.util.JsonPasswordSerializer;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
@@ -237,6 +238,19 @@ public class AccountScrubbed extends BaseAuditDataModel<AccountScrubbed> impleme
   @Override
   public AccountScrubbed setImageUrl(String imageUrl) {
     account.setImageUrl(imageUrl);
+    return this;
+  }
+
+  @Override
+  public OAuth2 getOAuth2() {
+    return account.getOAuth2()
+        // scrub
+        .setUserAttributes(Collections.emptyMap());
+  }
+
+  @Override
+  public AccountScrubbed setOAuth2(OAuth2 oAuth2) {
+    account.setOAuth2(oAuth2);
     return this;
   }
 

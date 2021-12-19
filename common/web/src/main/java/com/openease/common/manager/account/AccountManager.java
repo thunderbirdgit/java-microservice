@@ -24,10 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -48,6 +51,8 @@ import static com.openease.common.data.lang.MessageKeys.CRUD_UPDATE_STALE;
 import static com.openease.common.data.model.account.Account.PASSWORD_RESET_CODE_LENGTH;
 import static com.openease.common.data.model.account.Role.USER;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_CREDENTIALS_INVALID;
+import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_DISABLED;
+import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_LOCKED;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_PASSWORDS_IDENTICAL;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_USERNAME_UNAVAILABLE;
 import static org.apache.commons.lang3.ObjectUtils.notEqual;
@@ -151,7 +156,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     account = accountDao.save(account);
 
     if (!account.isVerified()) {
-      LOG.debug("Send verification email");
+      LOG.debug("Sending verification email");
       try {
         submitSendVerifyAccountEmailTask(account);
       } catch (Exception e) {
@@ -159,7 +164,13 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
         throw new RuntimeException("Something really bad happened", e);
       }
     } else {
-      LOG.debug("Account is verified, *not* sending verification email");
+      LOG.debug("Account is verified, sending welcome email");
+      try {
+        submitSendWelcomeEmailTask(account);
+      } catch (Exception e) {
+        LOG.error(e::getMessage, e);
+        throw new RuntimeException("Something really bad happened", e);
+      }
     }
 
     LOG.debug("account: {}", account::toStringUsingMixIn);
@@ -217,65 +228,80 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     return account;
   }
 
-  public Account update(AccountScrubbed updatedAccount) throws GeneralManagerException {
-    LOG.debug("updatedAccount: {}", () -> (updatedAccount == null ? null : updatedAccount.toStringUsingMixIn()));
-    checkForNullAccountScrubbed(updatedAccount);
+  public Account update(AccountScrubbed accountScrubbed) throws GeneralManagerException {
+    LOG.debug("accountScrubbed: {}", () -> (accountScrubbed == null ? null : accountScrubbed.toStringUsingMixIn()));
+    checkForNullAccount(accountScrubbed);
 
     // check account exists
     Account accountToUpdate;
-    Optional<Account> optional = accountDao.findById(updatedAccount.getId());
+    Optional<Account> optional = accountDao.findById(accountScrubbed.getId());
     if (optional.isPresent()) {
       accountToUpdate = optional.get();
     } else {
-      throw new GeneralManagerException(CRUD_NOTFOUND, "Account with id [" + updatedAccount.getId() + "] *not* found");
+      throw new GeneralManagerException(CRUD_NOTFOUND, "Account with id [" + accountScrubbed.getId() + "] *not* found");
     }
     LOG.trace("accountToUpdate: {}", accountToUpdate::toStringUsingMixIn);
 
     //TODO: remove since the DAO can do this now (test before removing)
     // check if updating is stale (via optimistic locking)
-    if (notEqual(accountToUpdate.getLastModified(), updatedAccount.getLastModified())) {
+    if (notEqual(accountToUpdate.getLastModified(), accountScrubbed.getLastModified())) {
       throw new GeneralManagerException(CRUD_UPDATE_STALE, "Update rejected via optimistic locking");
     }
 
-    // update account fields
-    accountToUpdate.setFirstName(updatedAccount.getFirstName())
-        .setLastName(updatedAccount.getLastName())
-        .setCompanyName(updatedAccount.getCompanyName())
-        .setLocale(updatedAccount.getLocale());
+    // update account regular fields
+    accountToUpdate.setFirstName(accountScrubbed.getFirstName())
+        .setLastName(accountScrubbed.getLastName())
+        .setGender(accountScrubbed.getGender())
+        .setCompanyName(accountScrubbed.getCompanyName())
+        .setLocale(accountScrubbed.getLocale());
 
-    // check if username (email) has changed
+    // update account username
     Account staleAccount = null;
-    if (!equalsIgnoreCase(updatedAccount.getUsername(), accountToUpdate.getUsername())) {
+    if (!equalsIgnoreCase(accountScrubbed.getUsername(), accountToUpdate.getUsername())) {
       LOG.debug("Account username (email) changed");
+      // only verify password if account is non-OAuth2
+      if (accountToUpdate.getOAuth2() == null) {
+        LOG.debug("Verify current password");
+        verifyPassword(accountToUpdate, accountScrubbed.getPasswordVerification());
+      } else {
+        LOG.debug("Account is attached to OAuth 2.0, skipping password verification");
+      }
+
       // grab stale account
       staleAccount = copy(accountToUpdate);
       // update account username (email)
-      accountToUpdate.setUsername(updatedAccount.getUsername())
-          .setVerified(false);
+      accountToUpdate.setUsername(accountScrubbed.getUsername())
+          // reset to unverified
+          .setVerified(false)
+          // remove any OAuth2 info since username (email) has changed
+          .setOAuth2(null);
     }
 
-    update(accountToUpdate);
+    // update account phone number
+    //TODO: verify password if phone number changed
+
+    Account updatedAccount = update(accountToUpdate);
 
     // send emails if username (email) has changed (staleAccount will be non-null)
     if (staleAccount != null) {
-      LOG.debug("Send username changed notification to stale email address");
+      LOG.debug("Sending username changed notification to stale email address");
       try {
-        submitSendNotifyUsernameChangeEmailTask(accountToUpdate, staleAccount);
+        submitSendNotifyUsernameChangeEmailTask(updatedAccount, staleAccount);
       } catch (Exception e) {
         LOG.error(e::getMessage, e);
         throw new RuntimeException("Something really bad happened", e);
       }
 
-      LOG.debug("Send verification email");
+      LOG.debug("Sending verification email");
       try {
-        submitSendVerifyAccountEmailTask(accountToUpdate);
+        submitSendVerifyAccountEmailTask(updatedAccount);
       } catch (Exception e) {
         LOG.error(e::getMessage, e);
         throw new RuntimeException("Something really bad happened", e);
       }
     }
 
-    return accountToUpdate;
+    return updatedAccount;
   }
 
   public Account disable(Account disabledAccount) throws GeneralManagerException {
@@ -319,7 +345,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     }
 
     if (!account.isVerified()) {
-      LOG.debug("Send verification email");
+      LOG.debug("Sending verification email");
       try {
         submitSendVerifyAccountEmailTask(account);
       } catch (Exception e) {
@@ -351,6 +377,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
   public void updatePassword(Account account, AccountUpdatePasswordRequest request, boolean skipPasswordVerification) throws GeneralManagerException {
     final Account finalAccount = account;
     LOG.debug("account: {}", () -> (finalAccount == null ? null : finalAccount.toStringUsingMixIn()));
+    LOG.debug("skipPasswordVerification: {}", () -> skipPasswordVerification);
     checkForNullAccount(account);
 
     LOG.debug("request: {}", () -> (request == null ? null : request.toStringUsingMixIn()));
@@ -360,8 +387,13 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     }
 
     if (!skipPasswordVerification) {
-      LOG.debug("Verify current password");
-      verifyPassword(account, request.getCurrentPassword());
+      // only verify password if account is non-OAuth2
+      if (account.getOAuth2() == null) {
+        LOG.debug("Verify current password");
+        verifyPassword(account, request.getCurrentPassword());
+      } else {
+        LOG.debug("Account is attached to OAuth 2.0, skipping password verification");
+      }
     }
 
     LOG.debug("Verify new password is not identical to current password");
@@ -371,6 +403,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
 
     LOG.debug("Set new password and update account");
     encryptPassword(account, request.getNewPassword());
+    account.setOAuth2(null);
     try {
       account = accountDao.update(account);
     } catch (GeneralDataException de) {
@@ -378,7 +411,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
       throw new GeneralManagerException(de.getKey(), de.getMessage());
     }
 
-    LOG.debug("Send password changed notification email");
+    LOG.debug("Sending password changed notification email");
     try {
       submitSendNotifyPasswordChangeEmailTask(account);
     } catch (Exception e) {
@@ -412,27 +445,30 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     updatePassword(account, request, false);
   }
 
-  public Authentication verifyPassword(Account account, String password) throws GeneralManagerException {
+  public void verifyPassword(Account account, String password) throws GeneralManagerException {
     LOG.debug("account: {}", () -> (account == null ? null : account.toStringUsingMixIn()));
     if (account == null) {
       throw new GeneralManagerException(MANAGER_ACCOUNT_CREDENTIALS_INVALID, "Username or password invalid");
     }
 
-    Authentication authentication;
-
     try {
       final AuthenticationManager authenticationManager = BeanLocator.byClassAndName(AuthenticationManager.class, "authenticationManager");
-      authentication = new UsernamePasswordAuthenticationToken(account, password, account.getAuthorities());
-      authentication = authenticationManager.authenticate(authentication);
-    } catch (AuthenticationException ae) {
-      LOG.warn("{}: {}", () -> ae.getClass().getSimpleName(), ae::getMessage);
+      AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, password, account.getAuthorities());
+      Authentication successfulAuthentication = authenticationManager.authenticate(authentication);
+      LOG.trace("Authenticated successfully: {}", () -> (successfulAuthentication == null ? null : successfulAuthentication.getClass().getSimpleName()));
+    } catch (DisabledException de) {
+      LOG.warn("{}: {}", () -> de.getClass().getSimpleName(), de::getMessage);
+      throw new GeneralManagerException(MANAGER_ACCOUNT_DISABLED, "Account is disabled");
+    } catch (LockedException le) {
+      LOG.warn("{}: {}", () -> le.getClass().getSimpleName(), le::getMessage);
+      throw new GeneralManagerException(MANAGER_ACCOUNT_LOCKED, "Account is locked");
+    } catch (BadCredentialsException bce) {
+      LOG.warn("{}: {}", () -> bce.getClass().getSimpleName(), bce::getMessage);
       throw new GeneralManagerException(MANAGER_ACCOUNT_CREDENTIALS_INVALID, "Username or password invalid");
     } catch (Exception e) {
       LOG.error(e::getMessage, e);
       throw new RuntimeException("Something really bad happened", e);
     }
-
-    return authentication;
   }
 
   public boolean verify(String verificationCode) throws GeneralManagerException {
@@ -453,7 +489,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
       }
       codeFound = true;
 
-      LOG.debug("Send welcome email");
+      LOG.debug("Sending welcome email");
       try {
         submitSendWelcomeEmailTask(account);
       } catch (Exception e) {
@@ -483,7 +519,11 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     LOG.debug("username: {}", username);
-    return findByUsername(username);
+    Account account = findByUsername(username);
+    if (account == null) {
+      throw new UsernameNotFoundException("Username *not* found: " + username);
+    }
+    return account;
   }
 
   public boolean checkEmailAvailable(AccountCheckEmailAvailableRequest request) {
@@ -506,7 +546,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
         throw new GeneralManagerException(de.getKey(), de.getMessage());
       }
 
-      LOG.debug("Send password reset email");
+      LOG.debug("Sending password reset email");
       try {
         submitSendResetPasswordEmailTask(account);
       } catch (Exception e) {
@@ -538,7 +578,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
         throw new GeneralManagerException(de.getKey(), de.getMessage());
       }
 
-      LOG.debug("Send password changed notification email");
+      LOG.debug("Sending password changed notification email");
       try {
         submitSendNotifyPasswordChangeEmailTask(updatedAccount);
       } catch (Exception e) {
@@ -681,7 +721,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     }
   }
 
-  private void checkForNullAccountScrubbed(AccountScrubbed accountScrubbed) throws GeneralManagerException {
+  private void checkForNullAccount(AccountScrubbed accountScrubbed) throws GeneralManagerException {
     if (accountScrubbed == null) {
       LOG.warn("accountScrubbed is null");
       throw new GeneralManagerException(CRUD_BADREQUEST, "account is null");
