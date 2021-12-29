@@ -3,7 +3,6 @@ package com.openease.common.web.filter;
 import com.openease.common.data.model.account.Account;
 import com.openease.common.manager.account.AccountManager;
 import com.openease.common.manager.jwt.JwtManager;
-import com.openease.common.manager.session.SessionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired
   private AccountManager accountManager;
-
-  @Autowired
-  private SessionManager sessionManager;
 
   @Override
   protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain) throws ServletException, IOException {

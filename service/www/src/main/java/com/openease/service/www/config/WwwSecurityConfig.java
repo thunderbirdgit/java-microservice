@@ -72,48 +72,20 @@ public class WwwSecurityConfig extends BaseAuthSecurityConfig {
         .httpBasic()
           .disable()
 
-//        .authorizeRequests()
-//          .antMatchers(
-//              /* welcome pages */
-//              "/",
-//              "/index.html",
-//              /* end-points */
-//              "/info/**",
-//              "/enum/**",
-//              "/v1/**",
-//              /* pages */
-//              "/error", "/error/",
-//              "/pages", "/pages/",
-//              "/templates", "/templates/",
-//              /* static assets */
-//              "/**/static/**",
-//              "/**/js/**",
-//              "/**/css/**",
-//              "/**/img/**",
-//              "/**/media/**",
-//              "/**/*.ico",
-//              /* auth */
-//              "/sign-in.html",
-//              "/sessions/**"
-//          )
-//            .permitAll()
-//          .anyRequest()
-//            .authenticated()
-//          .and()
-
         /* OAuth 2.0 */
         .oauth2Login()
           .loginPage("/")
 //          .loginProcessingUrl()
           .authorizationEndpoint()
-            .baseUri("/sessions/oauth2/authorize")
+            .baseUri("/security/auth/oauth2/authorize")
             .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
           .and()
           .redirectionEndpoint()
-            .baseUri("/sessions/oauth2/callback/*")
+            .baseUri("/security/auth/oauth2/callback/*")
           .and()
           .userInfoEndpoint()
             .userService(oAuth2AccountManager)
+//TODO:            .oidcUserService(oAuth2AccountManager)
           .and()
           .successHandler(oAuth2AuthenticationSuccessHandler)
           .failureHandler(oAuth2AuthenticationFailureHandler)
@@ -121,7 +93,7 @@ public class WwwSecurityConfig extends BaseAuthSecurityConfig {
 
         /* Sign Out */
         .logout()
-          .logoutRequestMatcher(new AntPathRequestMatcher("/sessions", DELETE.name()))
+          .logoutRequestMatcher(new AntPathRequestMatcher("/security/auth", DELETE.name()))
           .logoutSuccessUrl("/")
           .and()
 

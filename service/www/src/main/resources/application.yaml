@@ -64,18 +64,34 @@ spring:
           google:
             client-id: "..."
             client-secret: "..."
-            redirect-uri: "{baseUrl}/sessions/oauth2/callback/{registrationId}"
+            redirect-uri: "{baseUrl}/security/auth/oauth2/callback/{registrationId}"
             scope:
+              - "email"
               - "openid"
               - "profile"
-              - "email"
+#          apple:
+#            client-id: "..."
+#            client-secret: "..."
+#            redirect-uri: "{baseUrl}/security/auth/oauth2/callback/{registrationId}"
+#            authorization-grant-type: "authorization_code"
+#            client-authentication-method: "post"
+#            scope:
+#              - "email"
+#              - "openid"
+#              - "name"
 #          facebook:
 #            client-id: "..."
 #            client-secret: "..."
+#            redirect-uri: "{baseUrl}/security/auth/oauth2/callback/{registrationId}"
 #            scope:
-#              - "public_profile"
 #              - "email"
+#              - "public_profile"
 #        provider:
+#          apple:
+#            authorization-uri: "https://appleid.apple.com/auth/authorize?response_mode=form_post"
+#            token-uri: "https://appleid.apple.com/auth/token"
+#            jwk-set-uri: "https://appleid.apple.com/auth/keys"
+#            user-name-attribute: "sub"
 #          facebook:
 #            authorization-uri: "https://www.facebook.com/v3.0/dialog/oauth"
 #            token-uri: "https://graph.facebook.com/v3.0/oauth/access_token"
@@ -153,12 +169,11 @@ config:
     oauth2:
       # After successfully authenticating with the OAuth 2.0 Provider, we will be
       # generating an auth token for the user and sending the token to the
-      # redirect_uri mentioned by the client in the /oauth2/authorize request.
-      # We are not using cookies because they will not work well in mobile clients.
+      # redirect_uri mentioned by the client in the /security/auth/oauth2/authorize request.
       authorized-redirect-uris:
-        - "http://localhost:3000/oauth2/redirect"
-        - "myandroidapp:///oauth2/redirect"
-        - "myiosapp:///oauth2/redirect"
+        - "http://localhost:3000/security/auth/oauth2/redirect"
+        - "myandroidapp:///security/auth/oauth2/redirect"
+        - "myiosapp:///security/auth/oauth2/redirect"
 
 # Message Source
 message-source:

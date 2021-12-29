@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import static com.openease.common.web.util.HttpUtils.getIpAddress;
  * @author Alan Czajkowski
  */
 @Service
+@DependsOn({"elasticsearchEmbeddedServer"})
 public class DefaultAsyncEventLogManager extends BaseEventLogManager {
 
   private static final transient Logger LOG = LogManager.getLogger(DefaultAsyncEventLogManager.class);

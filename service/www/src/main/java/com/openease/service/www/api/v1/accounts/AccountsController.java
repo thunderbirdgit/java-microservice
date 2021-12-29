@@ -11,7 +11,7 @@ import com.openease.common.manager.account.request.AccountUpdatePasswordRequest;
 import com.openease.common.manager.account.response.AccountUpdateResponse;
 import com.openease.common.manager.exception.GeneralManagerException;
 import com.openease.common.manager.jwt.JwtManager;
-import com.openease.common.manager.session.SessionManager;
+import com.openease.common.manager.security.SecurityManager;
 import com.openease.common.web.api.base.BaseApiController;
 import com.openease.common.web.api.base.exception.ApiException;
 import com.openease.common.web.api.base.model.response.SuccessApiResponse;
@@ -79,7 +79,7 @@ public class AccountsController extends BaseApiController {
   private AccountManager accountManager;
 
   @Autowired
-  private SessionManager sessionManager;
+  private SecurityManager securityManager;
 
   @Autowired
   private JwtManager jwtManager;
@@ -121,7 +121,7 @@ public class AccountsController extends BaseApiController {
   @PreAuthorize("isAuthenticated()")
   @GetMapping(path = "/me")
   public SuccessApiResponse read(HttpServletRequest httpRequest) {
-    String accountId = sessionManager.getSignedInAccountId();
+    String accountId = securityManager.getSignedInAccountId();
     return read(accountId, httpRequest);
   }
 
@@ -133,7 +133,7 @@ public class AccountsController extends BaseApiController {
       throw new ApiException(NOT_FOUND, CRUD_NOTFOUND);
     }
 
-    checkIdMatch(id, sessionManager.getSignedInAccountId());
+    checkIdMatch(id, securityManager.getSignedInAccountId());
 
     SuccessApiResponse<AccountScrubbed> response;
 
@@ -161,7 +161,7 @@ public class AccountsController extends BaseApiController {
     LOG.trace("id: {}", id);
     LOG.trace("accountScrubbed: {}", () -> (accountScrubbed == null ? null : accountScrubbed.toStringUsingMixIn()));
 
-    checkIdMatch(id, sessionManager.getSignedInAccountId());
+    checkIdMatch(id, securityManager.getSignedInAccountId());
     checkIdMatch(id, accountScrubbed.getId());
 
     SuccessApiResponse<AccountUpdateResponse> response;
@@ -213,13 +213,13 @@ public class AccountsController extends BaseApiController {
   public SuccessApiResponse<AccountScrubbed> disable(@PathVariable String id, HttpServletRequest httpRequest) {
     LOG.trace("id: {}", id);
 
-    checkIdMatch(id, sessionManager.getSignedInAccountId());
+    checkIdMatch(id, securityManager.getSignedInAccountId());
 
     SuccessApiResponse<AccountScrubbed> response;
 
     Account account;
     try {
-      account = sessionManager.getSignedInAccount();
+      account = securityManager.getSignedInAccount();
       account = accountManager.disable(account);
       response = createSuccessApiResponse(accountManager.scrub(account), messageSource, CRUD_DISABLE_SUCCESS);
     } catch (GeneralManagerException me) {
@@ -241,13 +241,13 @@ public class AccountsController extends BaseApiController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping(path = "/{id:" + ID_REGEX_RELAXED + "}/_sendVerificationCode")
   public SuccessApiResponse sendVerificationCode(@PathVariable String id, HttpServletRequest httpRequest) {
-    checkIdMatch(id, sessionManager.getSignedInAccountId());
+    checkIdMatch(id, securityManager.getSignedInAccountId());
 
     SuccessApiResponse response;
 
     Account account;
     try {
-      account = sessionManager.getSignedInAccount();
+      account = securityManager.getSignedInAccount();
       accountManager.sendVerificationCode(account);
       response = createSuccessApiResponse();
     } catch (GeneralManagerException me) {
@@ -272,13 +272,13 @@ public class AccountsController extends BaseApiController {
       throw new ApiException();
     }
 
-    checkIdMatch(id, sessionManager.getSignedInAccountId());
+    checkIdMatch(id, securityManager.getSignedInAccountId());
 
     SuccessApiResponse<AccountUpdateResponse> response;
 
     Account account;
     try {
-      account = sessionManager.getSignedInAccount();
+      account = securityManager.getSignedInAccount();
       accountManager.updatePassword(account, request);
       accountManager.verifyPassword(account, request.getNewPassword());
 

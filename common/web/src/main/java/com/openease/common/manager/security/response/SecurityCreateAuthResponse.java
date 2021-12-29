@@ -1,20 +1,20 @@
-package com.openease.common.manager.session.response;
+package com.openease.common.manager.security.response;
 
 import com.openease.common.data.model.account.HasAccountId;
 import com.openease.common.manager.base.model.BaseManagerModel;
 
 /**
- * Session create (sign-in) response
+ * Security: Create authentication (sign-in) response
  *
  * @author Alan Czajkowski
  */
-public class SessionCreateResponse extends BaseManagerModel implements HasAccountId<SessionCreateResponse> {
+public class SecurityCreateAuthResponse extends BaseManagerModel implements HasAccountId<SecurityCreateAuthResponse> {
 
   private String jwt;
 
   private String accountId;
 
-  public SessionCreateResponse() {
+  public SecurityCreateAuthResponse() {
     this.jwt = null;
     this.accountId = null;
   }
@@ -23,7 +23,7 @@ public class SessionCreateResponse extends BaseManagerModel implements HasAccoun
     return jwt;
   }
 
-  public SessionCreateResponse setJwt(String jwt) {
+  public SecurityCreateAuthResponse setJwt(String jwt) {
     this.jwt = jwt;
     return this;
   }
@@ -34,7 +34,7 @@ public class SessionCreateResponse extends BaseManagerModel implements HasAccoun
   }
 
   @Override
-  public SessionCreateResponse setAccountId(String accountId) {
+  public SecurityCreateAuthResponse setAccountId(String accountId) {
     this.accountId = accountId;
     return this;
   }

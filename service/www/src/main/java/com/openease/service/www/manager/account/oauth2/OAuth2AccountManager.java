@@ -84,13 +84,14 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
 
         switch (oAuth2Provider) {
           case GOOGLE:
-            updateAccountWithGoogleUserDetails(oAuth2Account);
-            break;
-          case FACEBOOK:
-            updateAccountWithFacebookUserDetails(oAuth2Account);
+            updateAccountWithGoogleDetails(oAuth2Account);
             break;
           case APPLE:
             //TODO: implement
+            LOG.error("Apple sign-in *not* implemented");
+            break;
+          case FACEBOOK:
+            updateAccountWithFacebookDetails(oAuth2Account);
             break;
         }
 
@@ -179,7 +180,7 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
     }
   }
 
-  private void updateAccountWithGoogleUserDetails(Account oAuth2Account) {
+  private void updateAccountWithGoogleDetails(Account oAuth2Account) {
     Map<String, Object> oAuth2UserAttributes = oAuth2Account.getOAuth2().getUserAttributes();
 
     updateAccountWithGenericUserDetails(oAuth2Account);
@@ -214,7 +215,7 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
     }
   }
 
-  private void updateAccountWithFacebookUserDetails(Account oAuth2Account) {
+  private void updateAccountWithFacebookDetails(Account oAuth2Account) {
     Map<String, Object> oAuth2UserAttributes = oAuth2Account.getOAuth2().getUserAttributes();
 
     updateAccountWithGenericUserDetails(oAuth2Account);

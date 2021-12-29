@@ -8,7 +8,7 @@ package com.openease.common.data.model.account;
 public enum OAuth2Provider {
 
   GOOGLE,
-  FACEBOOK,
-  APPLE
+  APPLE,
+  FACEBOOK
 
 }

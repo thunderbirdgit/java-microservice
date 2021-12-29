@@ -25,9 +25,9 @@ public abstract class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
 
-        /* Security Management */
+        /* Session Management */
         .sessionManagement()
-          // sessions are stateless, use JWT if needed
+          // sessions are stateless (no cookies), use JWT if needed
           .sessionCreationPolicy(STATELESS)
           .and()
 

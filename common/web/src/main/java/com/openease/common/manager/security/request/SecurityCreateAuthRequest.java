@@ -1,4 +1,4 @@
-package com.openease.common.manager.session.request;
+package com.openease.common.manager.security.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.openease.common.manager.base.model.BaseManagerModel;
@@ -14,11 +14,11 @@ import static org.apache.commons.lang3.StringUtils.lowerCase;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
- * Session: Create (sign-in) request
+ * Security: Create authentication (sign-in) request
  *
  * @author Alan Czajkowski
  */
-public class SessionCreateRequest extends BaseManagerModel {
+public class SecurityCreateAuthRequest extends BaseManagerModel {
 
   @NotBlank(message = "{" + VALIDATION_EMAIL_NOTBLANK + "}")
   @Email(message = "{" + VALIDATION_EMAIL_INVALID + "}")
@@ -33,7 +33,7 @@ public class SessionCreateRequest extends BaseManagerModel {
     return username;
   }
 
-  public SessionCreateRequest setUsername(String username) {
+  public SecurityCreateAuthRequest setUsername(String username) {
     this.username = trim(lowerCase(username));
     return this;
   }
@@ -42,7 +42,7 @@ public class SessionCreateRequest extends BaseManagerModel {
     return password;
   }
 
-  public SessionCreateRequest setPassword(String password) {
+  public SecurityCreateAuthRequest setPassword(String password) {
     this.password = password;
     return this;
   }
@@ -51,12 +51,12 @@ public class SessionCreateRequest extends BaseManagerModel {
     return captchaUserToken;
   }
 
-  public SessionCreateRequest setCaptchaUserToken(String captchaUserToken) {
+  public SecurityCreateAuthRequest setCaptchaUserToken(String captchaUserToken) {
     this.captchaUserToken = captchaUserToken;
     return this;
   }
 
-  private class MixIn extends SessionCreateRequest {
+  private class MixIn extends SecurityCreateAuthRequest {
 
     @Override
     @JsonSerialize(using = JsonPasswordSerializer.class)
@@ -68,7 +68,7 @@ public class SessionCreateRequest extends BaseManagerModel {
 
   @Override
   protected Class<?> getMixInClass() {
-    return SessionCreateRequest.MixIn.class;
+    return SecurityCreateAuthRequest.MixIn.class;
   }
 
 }

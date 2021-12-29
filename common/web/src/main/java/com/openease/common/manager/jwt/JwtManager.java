@@ -14,7 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -43,6 +43,7 @@ public class JwtManager {
     String username = null;
     if (authentication == null) {
       LOG.trace("No authentication provided");
+      //TODO: throw GeneralManagerException
     } else {
       LOG.debug("{} is of type: {}", Authentication.class::getSimpleName, () -> authentication.getClass().getSimpleName());
       Object principal = authentication.getPrincipal();
@@ -52,15 +53,17 @@ public class JwtManager {
           Account account = (Account) principal;
           username = account.getUsername();
           LOG.trace("{}: {}", () -> account.getClass().getSimpleName(), account::toStringUsingMixIn);
-        } else if (principal instanceof DefaultOidcUser) {  // Google account
-          DefaultOidcUser oidcUser = (DefaultOidcUser) principal;
+        } else if (principal instanceof OidcUser) {  // Google account
+          OidcUser oidcUser = (OidcUser) principal;
           username = oidcUser.getEmail();
           LOG.trace("{}: {}", () -> oidcUser.getClass().getSimpleName(), () -> toJson(oidcUser, true));
         } else {
-          LOG.warn("{}.principal is *not* of type: {}", () -> authentication.getClass().getSimpleName(), DefaultOidcUser.class::getSimpleName);
+          LOG.warn("{}.principal is *not* of type: {}", () -> authentication.getClass().getSimpleName(), OidcUser.class::getSimpleName);
+          //TODO: throw GeneralManagerException
         }
       } else {
         LOG.warn("{}.principal is null", () -> authentication.getClass().getSimpleName());
+        //TODO: throw GeneralManagerException
       }
     }
 
@@ -69,6 +72,7 @@ public class JwtManager {
       long expiry = now + Duration.ofSeconds(config.getAuth().getJwtExpirationSeconds()).toMillis();
       byte[] keyBytes = Decoders.BASE64.decode(config.getAuth().getJwtSecretBase64());
       Key key = Keys.hmacShaKeyFor(keyBytes);
+      //TODO: catch WeakKeyException and throw GeneralManagerException
       token = Jwts.builder()
           // set JWT Claims sub (subject) value
           .setSubject(username)

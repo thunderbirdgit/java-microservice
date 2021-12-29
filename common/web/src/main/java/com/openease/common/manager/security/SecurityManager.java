@@ -1,11 +1,11 @@
-package com.openease.common.manager.session;
+package com.openease.common.manager.security;
 
 import com.openease.common.data.model.account.Account;
 import com.openease.common.manager.account.AccountManager;
 import com.openease.common.manager.exception.GeneralManagerException;
 import com.openease.common.manager.jwt.JwtManager;
-import com.openease.common.manager.session.request.SessionCreateRequest;
-import com.openease.common.manager.session.response.SessionCreateResponse;
+import com.openease.common.manager.security.request.SecurityCreateAuthRequest;
+import com.openease.common.manager.security.response.SecurityCreateAuthResponse;
 import com.openease.common.web.security.BaseAuthSecurityConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,16 +21,16 @@ import static com.openease.common.data.lang.MessageKeys.CRUD_BADREQUEST;
 import static com.openease.common.web.security.BaseAuthSecurityConfig.getSignedInUsername;
 
 /**
- * Session manager
+ * Security manager
  *
  * @author Alan Czajkowski
  */
 @Service
-public class SessionManager {
+public class SecurityManager {
 
-  private static final transient Logger LOG = LogManager.getLogger(SessionManager.class);
+  private static final transient Logger LOG = LogManager.getLogger(SecurityManager.class);
 
-  public static final String SESSIONS = "sessions";
+  public static final String SECURITY = "security";
 
   @Autowired
   private AccountManager accountManager;
@@ -45,22 +45,22 @@ public class SessionManager {
   }
 
   /**
-   * Create session (sign-in)
+   * Create security authentication (sign-in)
    *
-   * @param request {@link SessionCreateRequest}
+   * @param request {@link SecurityCreateAuthRequest}
    *
-   * @return {@link SessionCreateResponse}
+   * @return {@link SecurityCreateAuthResponse}
    *
    * @throws GeneralManagerException
    */
-  public SessionCreateResponse create(SessionCreateRequest request) throws GeneralManagerException {
+  public SecurityCreateAuthResponse create(SecurityCreateAuthRequest request) throws GeneralManagerException {
     LOG.debug("request: {}", () -> (request == null ? null : request.toStringUsingMixIn()));
     if (request == null) {
       LOG.warn("request is null");
       throw new GeneralManagerException(CRUD_BADREQUEST, "request is null");
     }
 
-    SessionCreateResponse response;
+    SecurityCreateAuthResponse response;
 
     LOG.debug("Signing-in account username: [{}]", request::getUsername);
     Account account = accountManager.findByUsername(request.getUsername());
@@ -82,7 +82,7 @@ public class SessionManager {
     LOG.debug("Signed-in account username: [{}]", BaseAuthSecurityConfig::getSignedInUsername);
 
     // set response
-    response = new SessionCreateResponse()
+    response = new SecurityCreateAuthResponse()
         .setJwt(jwt)
         .setAccountId(account.getId());
 
@@ -91,7 +91,7 @@ public class SessionManager {
   }
 
   /**
-   * Delete session (sign-out)
+   * Delete security authentication (sign-out)
    */
   public void delete() {
     LOG.debug("Signing-out account username: [{}]", BaseAuthSecurityConfig::getSignedInUsername);
