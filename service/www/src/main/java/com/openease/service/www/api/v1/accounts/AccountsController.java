@@ -119,7 +119,7 @@ public class AccountsController extends BaseApiController {
   }
 
   @PreAuthorize("isAuthenticated()")
-  @GetMapping(path = "/me")
+  @GetMapping(path = "/_me")
   public SuccessApiResponse read(HttpServletRequest httpRequest) {
     String accountId = securityManager.getSignedInAccountId();
     return read(accountId, httpRequest);
