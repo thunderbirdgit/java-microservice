@@ -172,8 +172,7 @@ config:
       # redirect_uri mentioned by the client in the /security/auth/oauth2/authorize request.
       authorized-redirect-uris:
         - "http://localhost:3000/security/auth/oauth2/redirect"
-        - "myandroidapp:///security/auth/oauth2/redirect"
-        - "myiosapp:///security/auth/oauth2/redirect"
+        - "myexampleapp:///security/auth/oauth2/redirect"
 
 # Message Source
 message-source:
