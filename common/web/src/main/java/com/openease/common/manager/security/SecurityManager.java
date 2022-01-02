@@ -73,7 +73,6 @@ public class SecurityManager {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     LOG.debug("Creating JWT for account username: [{}]", account::getUsername);
-    //TODO: throw GeneralManagerException
     String jwt = jwtManager.createJwt(authentication);
     if (jwt == null) {
       throw new RuntimeException("Sorry! Unable to create JWT");

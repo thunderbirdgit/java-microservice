@@ -2,6 +2,7 @@ package com.openease.service.www.manager.account.oauth2;
 
 import com.openease.common.config.Config;
 import com.openease.common.data.model.account.OAuth2Provider;
+import com.openease.common.manager.exception.GeneralManagerException;
 import com.openease.common.manager.jwt.JwtManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +25,8 @@ import java.net.URI;
 import java.util.Optional;
 
 import static com.openease.common.web.util.HttpUtils.getCookie;
-import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.upperCase;
 
 /**
@@ -92,19 +94,24 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
   @Override
   protected String determineTargetUrl(HttpServletRequest httpRequest, HttpServletResponse response, Authentication authentication) {
-    Optional<String> redirectUri = getCookie(httpRequest, REDIRECT_URI_PARAM_COOKIE_NAME)
+    Optional<String> redirectUri = getCookie(httpRequest, REDIRECT_URI)
         .map(Cookie::getValue);
 
-    if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
-      throw new RuntimeException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+    if (redirectUri.isPresent() && !isRedirectUriAuthorized(redirectUri.get())) {
+      throw new OAuth2AuthenticationException("Unauthorized redirect URI");
     }
 
     String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-    //TODO: throw GeneralManagerException
-    String jwt = jwtManager.createJwt(authentication);
+    String jwt;
+    try {
+      jwt = jwtManager.createJwt(authentication);
+    } catch (GeneralManagerException me) {
+      LOG.error(me::getMessage, me);
+      throw new OAuth2AuthenticationException(me.getMessage());
+    }
     if (jwt == null) {
-      throw new RuntimeException("Sorry! Unable to create JWT");
+      throw new OAuth2AuthenticationException("Created JWT is invalid");
     }
 
     return UriComponentsBuilder.fromUriString(targetUrl)
@@ -118,20 +125,22 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
   }
 
-  private boolean isAuthorizedRedirectUri(String uri) {
-    URI clientRedirectUri = URI.create(uri);
+  private boolean isRedirectUriAuthorized(String uri) {
+    boolean authorized = false;
 
-    return config.getAuth().getOAuth2().getAuthorizedRedirectUris()
-        .stream()
-        .anyMatch(redirectUri -> {
-          // only validate host and port, let the clients use different paths if they want to
-          URI authorizedRedirectUri = URI.create(redirectUri);
-          if (authorizedRedirectUri.getHost().equalsIgnoreCase(clientRedirectUri.getHost()) &&
-              authorizedRedirectUri.getPort() == clientRedirectUri.getPort()) {
-            return true;
-          }
-          return false;
-        });
+    if (isNotBlank(uri)) {
+      URI clientRedirectUri = URI.create(uri);
+      authorized = config.getAuth().getOAuth2().getAuthorizedRedirectUris()
+          .stream()
+          .anyMatch(redirectUri -> {
+            // validate only host and port (let client use different path if desired)
+            URI authorizedRedirectUri = URI.create(redirectUri);
+            return authorizedRedirectUri.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+                && authorizedRedirectUri.getPort() == clientRedirectUri.getPort();
+          });
+    }
+
+    return authorized;
   }
 
 }

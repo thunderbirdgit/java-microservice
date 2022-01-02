@@ -2,6 +2,7 @@ package com.openease.common.manager.jwt;
 
 import com.openease.common.config.Config;
 import com.openease.common.data.model.account.Account;
+import com.openease.common.manager.exception.GeneralManagerException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,6 +11,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.security.WeakKeyException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
 
+import static com.openease.common.manager.lang.MessageKeys.MANAGER_JWT_ERROR_GENERALFAILURE;
 import static com.openease.common.util.JsonUtils.toJson;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -37,13 +40,13 @@ public class JwtManager {
   @Autowired
   private Config config;
 
-  public String createJwt(Authentication authentication) {
+  public String createJwt(Authentication authentication) throws GeneralManagerException {
     String token = null;
 
     String username = null;
     if (authentication == null) {
       LOG.trace("No authentication provided");
-      //TODO: throw GeneralManagerException
+      throw new GeneralManagerException(MANAGER_JWT_ERROR_GENERALFAILURE, "No authentication provided");
     } else {
       LOG.debug("{} is of type: {}", Authentication.class::getSimpleName, () -> authentication.getClass().getSimpleName());
       Object principal = authentication.getPrincipal();
@@ -59,11 +62,11 @@ public class JwtManager {
           LOG.trace("{}: {}", () -> oidcUser.getClass().getSimpleName(), () -> toJson(oidcUser, true));
         } else {
           LOG.warn("{}.principal is *not* of type: {}", () -> authentication.getClass().getSimpleName(), OidcUser.class::getSimpleName);
-          //TODO: throw GeneralManagerException
+          throw new GeneralManagerException(MANAGER_JWT_ERROR_GENERALFAILURE, authentication.getClass().getSimpleName() + ".principal is *not* of type: " + OidcUser.class.getSimpleName());
         }
       } else {
         LOG.warn("{}.principal is null", () -> authentication.getClass().getSimpleName());
-        //TODO: throw GeneralManagerException
+        throw new GeneralManagerException(MANAGER_JWT_ERROR_GENERALFAILURE, authentication.getClass().getSimpleName() + "{}.principal is null");
       }
     }
 
@@ -71,10 +74,14 @@ public class JwtManager {
       long now = System.currentTimeMillis();
       long expiry = now + Duration.ofSeconds(config.getAuth().getJwtExpirationSeconds()).toMillis();
       byte[] keyBytes = Decoders.BASE64.decode(config.getAuth().getJwtSecretBase64());
-      Key key = Keys.hmacShaKeyFor(keyBytes);
-      //TODO: catch WeakKeyException and throw GeneralManagerException
+      Key key;
+      try {
+        key = Keys.hmacShaKeyFor(keyBytes);
+      } catch (WeakKeyException wke) {
+        throw new GeneralManagerException(MANAGER_JWT_ERROR_GENERALFAILURE, wke);
+      }
       token = Jwts.builder()
-          // set JWT Claims sub (subject) value
+          // set JWT Claims subject (sub) value to account username
           .setSubject(username)
           .setIssuedAt(new Date(now))
           .setExpiration(new Date(expiry))

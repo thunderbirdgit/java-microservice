@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -267,7 +268,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
         LOG.debug("Account is attached to OAuth 2.0, skipping password verification");
       }
 
-      // grab stale account
+      // grab stale account for notification purposes
       staleAccount = copy(accountToUpdate);
       // update account username (email)
       accountToUpdate.setUsername(accountScrubbed.getUsername())
@@ -278,9 +279,14 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     }
 
     // update account phone number
-    //TODO: verify password if phone number changed
+    if (Objects.equals(accountScrubbed.getPhoneNumber(), accountToUpdate.getPhoneNumber())) {
+      LOG.debug("Account phone number changed");
+      LOG.debug("Verify current password");
+      verifyPassword(accountToUpdate, accountScrubbed.getPasswordVerification());
+    }
 
     Account updatedAccount = update(accountToUpdate);
+    //TODO: send notification account info has changed
 
     // send emails if username (email) has changed (staleAccount will be non-null)
     if (staleAccount != null) {

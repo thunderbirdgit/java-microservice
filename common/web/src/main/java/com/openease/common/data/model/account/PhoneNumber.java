@@ -9,10 +9,12 @@ import com.openease.common.data.model.base.BaseModel;
 
 import java.util.IllformedLocaleException;
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.openease.common.data.model.base.BaseDataModel.DEFAULT_LOCALE;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * Phone number model
@@ -39,7 +41,7 @@ public class PhoneNumber extends BaseModel<PhoneNumber> {
     if (isNotBlank(regionCode)) {
       try {
         locale = new Locale.Builder()
-            .setRegion(regionCode)
+            .setRegion(trim(regionCode))
             .build();
       } catch (IllformedLocaleException ile) {
         // ignore
@@ -63,7 +65,7 @@ public class PhoneNumber extends BaseModel<PhoneNumber> {
   }
 
   public PhoneNumber setNumber(String number) {
-    this.number = number;
+    this.number = trim(number);
     return this;
   }
 
@@ -80,6 +82,24 @@ public class PhoneNumber extends BaseModel<PhoneNumber> {
       // ignore
     }
     return phoneNumber;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof PhoneNumber)) {
+      return false;
+    }
+    PhoneNumber that = (PhoneNumber) o;
+    return getRegionCode().equals(that.getRegionCode())
+        && getNumber().equals(that.getNumber());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getRegionCode(), getNumber());
   }
 
 }

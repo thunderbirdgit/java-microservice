@@ -28,16 +28,14 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
 
   private static final transient Logger LOG = LogManager.getLogger(HttpCookieOAuth2AuthorizationRequestRepository.class);
 
-  public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
-  public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
-
-  //TODO: move to config
-  private static final int COOKIE_MAX_AGE_SECONDS = (int) Duration.ofMinutes(3).toSeconds();
+  private static final int HTTP_COOKIE_MAX_AGE_SECONDS = (int) Duration.ofMinutes(3).toSeconds();
+  public static final String OAUTH2_AUTHORIZATION_REQUEST = "oauth2_auth_request";
+  public static final String REDIRECT_URI = "redirect_uri";
 
   @Override
   public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest httpRequest) {
     LOG.debug("HTTP Request: {} {}", httpRequest::getMethod, httpRequest::getRequestURL);
-    OAuth2AuthorizationRequest authorizationRequest = getCookie(httpRequest, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
+    OAuth2AuthorizationRequest authorizationRequest = getCookie(httpRequest, OAUTH2_AUTHORIZATION_REQUEST)
         .map(cookie -> deserialize(cookie.getValue(), OAuth2AuthorizationRequest.class))
         .orElse(null);
     LOG.debug("{}: {}", OAuth2AuthorizationRequest.class::getSimpleName, () -> toJson(authorizationRequest, true));
@@ -52,12 +50,12 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
     if (authorizationRequest == null) {
       removeAuthorizationRequestCookies(httpRequest, httpResponse);
     } else {
-      LOG.debug("Adding cookie: {}", () -> OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-      addCookie(httpResponse, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, serialize(authorizationRequest), COOKIE_MAX_AGE_SECONDS);
-      String redirectUriAfterLogin = httpRequest.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
+      LOG.debug("Adding cookie: {}", () -> OAUTH2_AUTHORIZATION_REQUEST);
+      addCookie(httpResponse, OAUTH2_AUTHORIZATION_REQUEST, serialize(authorizationRequest), HTTP_COOKIE_MAX_AGE_SECONDS);
+      String redirectUriAfterLogin = httpRequest.getParameter(REDIRECT_URI);
       if (isNotBlank(redirectUriAfterLogin)) {
-        LOG.debug("Adding cookie: {}", () -> REDIRECT_URI_PARAM_COOKIE_NAME);
-        addCookie(httpResponse, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, COOKIE_MAX_AGE_SECONDS);
+        LOG.debug("Adding cookie: {}", () -> REDIRECT_URI);
+        addCookie(httpResponse, REDIRECT_URI, redirectUriAfterLogin, HTTP_COOKIE_MAX_AGE_SECONDS);
       }
     }
   }
@@ -69,10 +67,10 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
   }
 
   public void removeAuthorizationRequestCookies(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-    LOG.debug("Deleting cookie: {}", () -> OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-    deleteCookie(httpRequest, httpResponse, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-    LOG.debug("Deleting cookie: {}", () -> REDIRECT_URI_PARAM_COOKIE_NAME);
-    deleteCookie(httpRequest, httpResponse, REDIRECT_URI_PARAM_COOKIE_NAME);
+    LOG.debug("Deleting cookie: {}", () -> OAUTH2_AUTHORIZATION_REQUEST);
+    deleteCookie(httpRequest, httpResponse, OAUTH2_AUTHORIZATION_REQUEST);
+    LOG.debug("Deleting cookie: {}", () -> REDIRECT_URI);
+    deleteCookie(httpRequest, httpResponse, REDIRECT_URI);
   }
 
 }

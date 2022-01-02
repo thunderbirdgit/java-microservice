@@ -30,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private static final transient Logger LOG = LogManager.getLogger(JwtAuthenticationFilter.class);
 
   public static final String HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX = "Bearer ";
+  public static final int HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX_LENGTH = HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX.length();
 
   @Autowired
   private JwtManager jwtManager;
@@ -56,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           LOG.debug("Update security context with new authentication");
           AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
           //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-          LOG.trace("Updating authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
+          LOG.trace("Updating authentication in security context: {}", () -> authentication.getClass().getSimpleName());
           SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
           LOG.trace("Updating authentication in security context: null");
@@ -78,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String authorizationHeaderValue = httpRequest.getHeader(AUTHORIZATION);
     if (startsWithIgnoreCase(authorizationHeaderValue, HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX)) {
-      jwt = authorizationHeaderValue.substring(HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX.length());
+      jwt = authorizationHeaderValue.substring(HTTP_HEADER_AUTHORIZATION_BEARER_PREFIX_LENGTH);
     }
 
     return jwt;

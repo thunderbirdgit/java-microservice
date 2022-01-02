@@ -109,6 +109,12 @@ public class MessageKeys {
       "templates.sms.text.notifyUsernameChange.title";
 
   /**
+   * Messages for {@link com.openease.common.manager.jwt.JwtManager}
+   */
+  public static final String MANAGER_JWT_ERROR_GENERALFAILURE =
+      "manager.jwt.error.generalFailure";
+
+  /**
    * Messages for {@link com.openease.common.manager.payment.RemotePaymentManager}
    */
   public static final String MANAGER_PAYMENT_ERROR_GENERALFAILURE =
