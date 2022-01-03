@@ -108,7 +108,7 @@ public class WwwSecurityConfig extends BaseAuthSecurityConfig {
   }
 
   /**
-   * By default, Spring OAuth 2.0 uses {@link HttpSessionOAuth2AuthorizationRequestRepository}
+   * By default, Spring Security OAuth 2.0 uses {@link HttpSessionOAuth2AuthorizationRequestRepository}
    * to save the Authorization request, but since our service is stateless, we cannot
    * save it in the session. We will save the request in a Base64-encoded cookie instead.
    */

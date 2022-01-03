@@ -173,7 +173,7 @@ public class AccountsController extends BaseApiController {
       LOG.debug("Update security context with new authentication");
       AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
       //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-      LOG.trace("Updating authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
+      LOG.trace("Updating authentication in security context to: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
       LOG.debug("Creating JWT for account username: [{}]", account::getUsername);
@@ -285,7 +285,7 @@ public class AccountsController extends BaseApiController {
       LOG.debug("Update security context with new authentication");
       AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
       //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-      LOG.trace("Updating authentication in security context: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
+      LOG.trace("Updating authentication in security context to: {}", () -> (authentication == null ? null : authentication.getClass().getSimpleName()));
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
       LOG.debug("Creating JWT for account username: [{}]", account::getUsername);

@@ -50,7 +50,7 @@
     <dependency>
       <groupId>net.bull.javamelody</groupId>
       <artifactId>javamelody-spring-boot-starter</artifactId>
-      <version>1.88.0</version>
+      <version>1.90.0</version>
     </dependency>
 
     <!-- # Spring - Data -->
@@ -87,7 +87,7 @@
     <dependency>
       <groupId>com.blueconic</groupId>
       <artifactId>browscap-java</artifactId>
-      <version>1.3.7</version>
+      <version>1.3.11</version>
     </dependency>
 
   </dependencies>

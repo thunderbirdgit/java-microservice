@@ -57,14 +57,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           LOG.debug("Update security context with new authentication");
           AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(account, null, account.getAuthorities());
           //TODO: authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-          LOG.trace("Updating authentication in security context: {}", () -> authentication.getClass().getSimpleName());
+          LOG.trace("Updating authentication in security context to: {}", () -> authentication.getClass().getSimpleName());
           SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-          LOG.trace("Updating authentication in security context: null");
+          LOG.trace("Updating authentication in security context to: null");
           SecurityContextHolder.getContext().setAuthentication(null);
         }
       } else {
-        LOG.trace("Updating authentication in security context: null");
+        LOG.trace("Updating authentication in security context to: null");
         SecurityContextHolder.getContext().setAuthentication(null);
       }
     } catch (Exception e) {

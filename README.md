@@ -1,5 +1,5 @@
 [![Language: Java 11](https://img.shields.io/badge/Language-Java_11-blue.svg "Language: Java 11")](https://www.java.com/)
-[![Framework: Spring Boot 2.5](https://img.shields.io/badge/Framework-Spring_Boot_2.5-green.svg "Framework: Spring Boot 2.5")](https://spring.io/projects/spring-boot)
+[![Framework: Spring Boot 2.6](https://img.shields.io/badge/Framework-Spring_Boot_2.6-green.svg "Framework: Spring Boot 2.6")](https://spring.io/projects/spring-boot)
 
 # Java Microservice Example
 
@@ -11,6 +11,8 @@
 1. [Configuration, Environment, & Start-up](#configuration-environment--start-up)
 1. [Logging](#logging)
 1. [Internationalization (i18n)](#internationalization-i18n)
+1. [Monitoring (APM)](#monitoring-apm)
+1. [Authentication & Authorization](#authentication--authorization)
 1. [API Design](#api-design)
     1. [HTTP Methods & CRUD](#http-methods--crud)
     1. [Versioning](#versioning)
@@ -49,7 +51,10 @@ This project is an example of how to organize, architect, design, develop, and b
 - avoid maintaining micro-service compatibility matrix of services that interact with each other through a (Git) mono-repo using version parity across all micro-services (in the build and release process)
     - store all micro-services in a single Git repo, release them all at the same time, regardless if a service changed or not
     - this comes at the expense of needlessly releasing certain services if they have not changed but the trade-off is worth it because it is more valuable to _avoid_ tracking service compatibility than trying to _avoid_ releasing something because a version number might change
-
+- use a pragmatic monitoring solution
+  - [JavaMelody](https://github.com/javamelody/javamelody)
+- use a pragmatic "stateless" Authentication & Authorization management solution:
+  - an encrypted [JSON Web Token (JWT)](https://jwt.io/)
 
 ## Requirements
 
@@ -260,6 +265,17 @@ Example:
       - _etc._
     - `log4j2.yaml` contains a default configuration that must exist and should _not_ be modified
 
+
+## Monitoring (APM)
+
+- monitoring uses a simple integrated Application Performance Monitoring (APM) solution: [JavaMelody](https://github.com/javamelody/javamelody)
+- monitoring dashboard is fully integrated into Spring Boot actuators and secured using standard Spring Security settings
+
+## Authentication & Authorization
+
+- the default authentication & authorization mechanism for Java Containers and Spring Boot is to use Sessions and HTTP Cookies
+  - as cookies are not friendly to many front-end clients (mobile applications, etc.) it is much better to use an encrypted JSON Web Token (JWT) that can be safely passed around via the HTTP `Authorization` Header
+- a dedicated HTTP Filter named `JwtAuthenticationFilter` manages the authentication & authorization
 
 ## Internationalization (i18n)
 
