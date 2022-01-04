@@ -1,6 +1,8 @@
 package com.openease.common.config;
 
 import com.openease.common.Env;
+import com.openease.common.data.model.account.Account;
+import com.openease.common.data.model.account.Role;
 import com.openease.common.web.api.ApiVersion;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.openease.common.Env.local;
 
@@ -52,6 +55,8 @@ public class Config {
   private Cors cors;
 
   private Auth auth;
+
+  private Map<Role, List<Account>> testAccounts;
 
   public Config() {
     this.mask5xxErrors = true;
@@ -189,6 +194,15 @@ public class Config {
 
   public Config setAuth(Auth auth) {
     this.auth = auth;
+    return this;
+  }
+
+  public Map<Role, List<Account>> getTestAccounts() {
+    return testAccounts;
+  }
+
+  public Config setTestAccounts(Map<Role, List<Account>> testAccounts) {
+    this.testAccounts = testAccounts;
     return this;
   }
 

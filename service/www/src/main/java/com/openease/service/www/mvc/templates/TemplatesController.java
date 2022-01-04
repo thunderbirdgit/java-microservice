@@ -1,5 +1,7 @@
 package com.openease.service.www.mvc.templates;
 
+import com.openease.common.config.Config;
+import com.openease.common.data.model.account.Account;
 import com.openease.common.manager.exception.GeneralManagerException;
 import com.openease.common.manager.template.TemplateManager;
 import com.openease.common.web.mvc.base.BaseMvcController;
@@ -7,7 +9,6 @@ import com.openease.common.web.mvc.base.exception.MvcException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.openease.common.data.model.account.Role.USER;
 import static com.openease.common.manager.template.TemplateManager.SUFFIX_HTML;
 import static com.openease.common.manager.template.TemplateManager.SUFFIX_TXT;
 import static com.openease.common.manager.template.TemplateManager.TEMPLATES;
@@ -50,25 +52,22 @@ public class TemplatesController extends BaseMvcController {
 
   public static final String TEMPLATES_CONTEXT = "/" + TEMPLATES;
 
-  @Value("${dummy-account.email}")
-  private String dummyAccountEmail;
-
-  @Value("${dummy-account.first-name}")
-  private String dummyAccountFirstName;
-
-  @Value("${dummy-account.last-name}")
-  private String dummyAccountLastName;
+  @Autowired
+  private Config config;
 
   @Autowired
   private TemplateManager templateManager;
+
+  private Account testUserAccount;
 
   @PostConstruct
   public void init() {
     LOG.debug("Init started");
 
-    LOG.debug("dummy account email: {}", dummyAccountEmail);
-    LOG.debug("dummy account first name: {}", dummyAccountFirstName);
-    LOG.debug("dummy account last name: {}", dummyAccountLastName);
+    testUserAccount = config.getTestAccounts().get(USER).get(0);
+    LOG.debug("test user account username: {}", testUserAccount.getUsername());
+    LOG.debug("test user account first name: {}", testUserAccount.getFirstName());
+    LOG.debug("test user account last name: {}", testUserAccount.getLastName());
 
     LOG.debug("Init finished");
   }
@@ -143,9 +142,9 @@ public class TemplatesController extends BaseMvcController {
 
   private Map<String, Object> initTemplateModel() {
     Map<String, Object> templateModel = new HashMap<>();
-    templateModel.put(TEMPLATE_MODEL_EMAIL, dummyAccountEmail);
-    templateModel.put(TEMPLATE_MODEL_FIRSTNAME, dummyAccountFirstName);
-    templateModel.put(TEMPLATE_MODEL_LASTNAME, dummyAccountLastName);
+    templateModel.put(TEMPLATE_MODEL_EMAIL, testUserAccount.getUsername());
+    templateModel.put(TEMPLATE_MODEL_FIRSTNAME, testUserAccount.getFirstName());
+    templateModel.put(TEMPLATE_MODEL_LASTNAME, testUserAccount.getLastName());
     return templateModel;
   }
 

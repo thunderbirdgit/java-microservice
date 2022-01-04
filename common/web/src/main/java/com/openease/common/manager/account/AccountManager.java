@@ -1,5 +1,6 @@
 package com.openease.common.manager.account;
 
+import com.openease.common.config.Config;
 import com.openease.common.data.dao.account.AccountDao;
 import com.openease.common.data.exception.GeneralDataException;
 import com.openease.common.data.model.account.Account;
@@ -50,6 +51,7 @@ import static com.openease.common.data.lang.MessageKeys.CRUD_BADREQUEST;
 import static com.openease.common.data.lang.MessageKeys.CRUD_NOTFOUND;
 import static com.openease.common.data.lang.MessageKeys.CRUD_UPDATE_STALE;
 import static com.openease.common.data.model.account.Account.PASSWORD_RESET_CODE_LENGTH;
+import static com.openease.common.data.model.account.Role.ADMIN;
 import static com.openease.common.data.model.account.Role.USER;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_CREDENTIALS_INVALID;
 import static com.openease.common.manager.lang.MessageKeys.MANAGER_ACCOUNT_DISABLED;
@@ -75,6 +77,9 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
   private static final transient Logger LOG = LogManager.getLogger(AccountManager.class);
 
   @Autowired
+  private Config config;
+
+  @Autowired
   private AccountDao accountDao;
 
   @Autowired
@@ -87,57 +92,43 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-  //  @Value("${dummy-account.email}")
-//  private String dummyAccountEmail;
-//
-//  @Value("${dummy-account.first-name}")
-//  private String dummyAccountFirstName;
-//
-//  @Value("${dummy-account.last-name}")
-//  private String dummyAccountLastName;
-
   @PostConstruct
   public void init() {
     LOG.debug("Init started");
 
-////    accountDao.deleteAll();
-//    Iterable<Account> accounts = accountDao.findAll();
-//    LOG.trace("accounts in data store: {}", StreamSupport.stream(accounts.spliterator(), false).count());
-//
-//    Account account;
-//
-//    account = new Account()
-//        .setId("AAAABBBBCCCCDDDD2222")
-//        .setUsername(dummyAccountEmail.replace("@", "+super-admin@"))
-//        .setFirstName(dummyAccountFirstName)
-//        .setLastName(dummyAccountLastName)
-//        .setRole(SUPER_ADMIN);
-//    LOG.debug("account: {}", account);
-//    accountDao.save(account);
-//
-//    account = new Account()
-//        .setId("AAAABBBBCCCCDDDD3333")
-//        .setUsername(dummyAccountEmail.replace("@", "+admin@"))
-//        .setFirstName(dummyAccountFirstName)
-//        .setLastName(dummyAccountLastName)
-//        .setRole(ADMIN);
-//    LOG.debug("account: {}", account);
-//    accountDao.save(account);
-//
-//    account = new Account()
-//        .setId("AAAABBBBCCCCDDDD4444")
-//        .setUsername(dummyAccountEmail.replace("@", "+user@"))
-//        .setFirstName(dummyAccountFirstName)
-//        .setLastName(dummyAccountLastName)
-//        .setRole(USER);
-//    LOG.debug("account: {}", account);
-//    accountDao.save(account);
-//
-//    accounts = accountDao.findAll();
-//    LOG.trace("accounts in data store: {}", StreamSupport.stream(accounts.spliterator(), false).count());
-//
-//    account = accountDao.findById("AAAABBBBCCCCDDDD4444").get();
-//    LOG.trace("account[AAAABBBBCCCCDDDD4444]: {}", account);
+    LOG.debug("provision test accounts with role: {}", () -> ADMIN);
+    for (Account account : config.getTestAccounts().get(ADMIN)) {
+      encryptPassword(account, account.getPassword());
+      Optional<Account> optional = accountDao.findById(account.getId());
+      if (optional.isPresent()) {
+        try {
+          account.setCreated(optional.get().getCreated());
+          account.setLastModified(optional.get().getLastModified());
+          accountDao.update(account);
+        } catch (GeneralDataException de) {
+          LOG.warn(de.getMessage());
+        }
+      } else {
+        accountDao.save(account);
+      }
+    }
+
+    LOG.debug("provision test accounts with role: {}", () -> USER);
+    for (Account account : config.getTestAccounts().get(USER)) {
+      encryptPassword(account, account.getPassword());
+      Optional<Account> optional = accountDao.findById(account.getId());
+      if (optional.isPresent()) {
+        try {
+          account.setCreated(optional.get().getCreated());
+          account.setLastModified(optional.get().getLastModified());
+          accountDao.update(account);
+        } catch (GeneralDataException de) {
+          LOG.warn(de.getMessage());
+        }
+      } else {
+        accountDao.save(account);
+      }
+    }
 
     LOG.debug("Init finished");
   }

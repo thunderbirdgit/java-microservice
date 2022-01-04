@@ -167,12 +167,37 @@ config:
     jwt-secret-base64: "@buildNumber@@buildNumber@@buildNumber@"
     jwt-expiration-seconds: 864000
     oauth2:
-      # After successfully authenticating with the OAuth 2.0 Provider, we will be
-      # generating an auth token for the user and sending the token to the
-      # redirect_uri mentioned by the client in the /security/auth/oauth2/authorize request.
+      # After successfully authenticating with the OAuth 2.0 Provider, we will
+      # be generating an encrypted JSON Web Token (JWT) for the user and
+      # sending this token to the redirect_uri mentioned by the client in the
+      # /security/auth/oauth2/authorize request.
       authorized-redirect-uris:
         - "http://localhost:3000/security/auth/oauth2/redirect"
         - "myexampleapp:///security/auth/oauth2/redirect"
+
+  test-accounts:
+    ADMIN:
+      - id: "AAAABBBBCCCCDDDD1001"
+        username: "test+admin@example.com"
+        password: "@buildNumber@"
+        enabled: true
+        verified: true
+        roles:
+          - "ADMIN"
+        first-name: "Jane-Admin"
+        last-name: "Doe"
+        gender: "FEMALE"
+    USER:
+      - id: "AAAABBBBCCCCDDDD2001"
+        username: "test+user@example.com"
+        password: "@buildNumber@"
+        enabled: true
+        verified: true
+        roles:
+          - "USER"
+        first-name: "Jane-User"
+        last-name: "Doe"
+        gender: "FEMALE"
 
 # Message Source
 message-source:
@@ -233,9 +258,3 @@ manager:
           currency: "USD"
           per-month: 1000
           per-year: 10000
-
-# Dummy account
-dummy-account:
-  email: "jane.doe@example.com"
-  first-name: "Jane"
-  last-name: "Doe"
