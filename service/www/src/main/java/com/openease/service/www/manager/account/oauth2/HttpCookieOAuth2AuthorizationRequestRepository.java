@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
@@ -31,6 +32,12 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
   private static final int HTTP_COOKIE_MAX_AGE_SECONDS = (int) Duration.ofMinutes(3).toSeconds();
   public static final String OAUTH2_AUTHORIZATION_REQUEST = "oauth2_auth_request";
   public static final String REDIRECT_URI = "redirect_uri";
+
+  @PostConstruct
+  public void init() {
+    LOG.debug("Init started");
+    LOG.debug("Init finished");
+  }
 
   @Override
   public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest httpRequest) {

@@ -2,6 +2,7 @@ package com.openease.common.config;
 
 import com.openease.common.Env;
 import com.openease.common.data.model.account.Account;
+import com.openease.common.data.model.account.OAuth2Provider;
 import com.openease.common.data.model.account.Role;
 import com.openease.common.web.api.ApiVersion;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -469,6 +470,7 @@ public class Config {
 
   public static class OAuth2 {
     private List<String> authorizedRedirectUris;
+    private Map<OAuth2Provider, OAuth2Provider.AdditionalDetails> provider;
 
     public List<String> getAuthorizedRedirectUris() {
       return authorizedRedirectUris;
@@ -476,6 +478,15 @@ public class Config {
 
     public OAuth2 setAuthorizedRedirectUris(List<String> authorizedRedirectUris) {
       this.authorizedRedirectUris = authorizedRedirectUris;
+      return this;
+    }
+
+    public Map<OAuth2Provider, OAuth2Provider.AdditionalDetails> getProvider() {
+      return provider;
+    }
+
+    public OAuth2 setProvider(Map<OAuth2Provider, OAuth2Provider.AdditionalDetails> provider) {
+      this.provider = provider;
       return this;
     }
   }

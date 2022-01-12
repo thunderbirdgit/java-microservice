@@ -14,11 +14,15 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.openease.common.util.JsonUtils.toJson;
+import static com.openease.common.util.JsonUtils.toObject;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.lowerCase;
@@ -39,6 +43,12 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
 
   @Autowired
   private AccountManager accountManager;
+
+  @PostConstruct
+  public void init() {
+    LOG.debug("Init started");
+    LOG.debug("Init finished");
+  }
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -67,8 +77,8 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
     return account;
   }
 
-  public Account createOrUpdateAccountFromOAuth2User(OAuth2User oAuth2User, OAuth2Provider oAuth2Provider) {
-    Account account = null;
+  public Account createOrUpdateAccountFromOAuth2User(HttpServletRequest httpRequest, OAuth2User oAuth2User, OAuth2Provider oAuth2Provider) {
+    Account account;
 
     if (oAuth2User != null) {
       LOG.trace("{}: {}", () -> oAuth2User.getClass().getSimpleName(), () -> toJson(oAuth2User, true));
@@ -79,7 +89,8 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
         Account oAuth2Account = new Account()
             .setOAuth2(new OAuth2()
                 .setProvider(oAuth2Provider)
-                .setUserAttributes(oAuth2User.getAttributes())
+                // copy unmodifiable map into new map to make it modifiable
+                .setUserAttributes(new HashMap<>(oAuth2User.getAttributes()))
             );
 
         switch (oAuth2Provider) {
@@ -87,8 +98,7 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
             updateAccountWithGoogleDetails(oAuth2Account);
             break;
           case APPLE:
-            //TODO: implement
-            LOG.error("Apple sign-in *not* implemented");
+            updateAccountWithAppleDetails(oAuth2Account, httpRequest);
             break;
           case FACEBOOK:
             updateAccountWithFacebookDetails(oAuth2Account);
@@ -96,7 +106,7 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
         }
 
         // prune attributes
-        Map<String, Object> oAuth2UserAttributes = oAuth2User.getAttributes().entrySet()
+        Map<String, Object> oAuth2UserAttributes = oAuth2Account.getOAuth2().getUserAttributes().entrySet()
             .stream()
             .filter(entry -> entry.getValue() instanceof String
                 || entry.getValue() instanceof Boolean
@@ -176,6 +186,9 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
         case "1":
           oAuth2Account.setVerified(true);
           break;
+        default:
+          oAuth2Account.setVerified(false);
+          break;
       }
     }
   }
@@ -215,6 +228,23 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
     }
   }
 
+  private void updateAccountWithAppleDetails(Account oAuth2Account, HttpServletRequest httpRequest) {
+    updateAccountWithGenericUserDetails(oAuth2Account);
+
+    String appleUserString = httpRequest.getParameter("user");
+    if (isNotBlank(appleUserString)) {
+      OAuth2Provider.AppleUserDetails appleUserDetails = toObject(appleUserString, OAuth2Provider.AppleUserDetails.class);
+      LOG.debug("appleUserDetails: {}", () -> toJson(appleUserDetails));
+
+      oAuth2Account.getOAuth2().getUserAttributes().put("given_name", appleUserDetails.getName().getFirstName());
+      oAuth2Account.setFirstName(appleUserDetails.getName().getFirstName());
+
+      oAuth2Account.getOAuth2().getUserAttributes().put("family_name", appleUserDetails.getName().getLastName());
+      oAuth2Account.setLastName(appleUserDetails.getName().getLastName());
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   private void updateAccountWithFacebookDetails(Account oAuth2Account) {
     Map<String, Object> oAuth2UserAttributes = oAuth2Account.getOAuth2().getUserAttributes();
 

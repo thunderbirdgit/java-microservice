@@ -11,6 +11,8 @@ import com.openease.common.web.api.base.model.response.SuccessApiResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import static com.openease.common.data.lang.MessageKeys.CRUD_DELETE_SUCCESS;
@@ -39,7 +42,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  */
 @Controller
 @RequestMapping(path = SECURITY_CONTEXT, produces = APPLICATION_JSON_VALUE)
-public class SecurityController extends BaseApiController {
+public class SecurityController extends BaseApiController implements LogoutHandler {
 
   private static final transient Logger LOG = LogManager.getLogger(SecurityController.class);
 
@@ -60,6 +63,7 @@ public class SecurityController extends BaseApiController {
    */
   @PostMapping(path = {"/auth", "/auth/"})
   public SuccessApiResponse<SecurityCreateAuthResponse> create(@RequestBody @Valid SecurityCreateAuthRequest request, HttpServletRequest httpRequest) {
+    LOG.trace("{}.create()", SecurityController.class::getSimpleName);
     LOG.trace("request: {}", () -> (request == null ? null : request.toStringUsingMixIn()));
     if (request == null) {
       throw new ApiException();
@@ -93,6 +97,7 @@ public class SecurityController extends BaseApiController {
    */
   @DeleteMapping(path = {"/auth", "/auth/"})
   public SuccessApiResponse delete(HttpServletRequest httpRequest) {
+    LOG.trace("{}.delete()", SecurityController.class::getSimpleName);
     SuccessApiResponse response;
 
     Account signedInAccount = getSignedInAccount();
@@ -103,6 +108,13 @@ public class SecurityController extends BaseApiController {
     createEventLog(httpRequest, "Account signed out", null, signedInAccount);
     LOG.trace("response: {}", response);
     return response;
+  }
+
+  @Override
+  public void logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Authentication authentication) {
+    LOG.trace("{}.logout()", SecurityController.class::getSimpleName);
+    LOG.trace("{} is of type: {}", Authentication.class::getSimpleName, () -> authentication.getClass().getSimpleName());
+    delete(httpRequest);
   }
 
 }

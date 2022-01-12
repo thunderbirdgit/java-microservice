@@ -1,7 +1,9 @@
 package com.openease.service.www.config;
 
+import com.openease.common.config.Config;
 import com.openease.common.web.filter.JwtAuthenticationFilter;
 import com.openease.common.web.security.BaseAuthSecurityConfig;
+import com.openease.service.www.api.security.SecurityController;
 import com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.openease.service.www.manager.account.oauth2.OAuth2AccountManager;
 import com.openease.service.www.manager.account.oauth2.OAuth2AuthenticationFailureHandler;
@@ -18,9 +20,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.PostConstruct;
 
+import static com.openease.common.util.JsonUtils.toJson;
 import static org.springframework.http.HttpMethod.DELETE;
 
 /**
@@ -37,6 +44,9 @@ public class WwwSecurityConfig extends BaseAuthSecurityConfig {
   private static final transient Logger LOG = LogManager.getLogger(WwwSecurityConfig.class);
 
   @Autowired
+  private Config config;
+
+  @Autowired
   private OAuth2AccountManager oAuth2AccountManager;
 
   @Autowired
@@ -48,12 +58,52 @@ public class WwwSecurityConfig extends BaseAuthSecurityConfig {
   @Autowired
   private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
+  @Autowired
+  private SecurityController securityController;
+
   @PostConstruct
   @Override
   public void init() {
     LOG.debug("Init started");
     super.init();
+
+    LOG.debug("CORS allowed origins: {}", () -> toJson(config.getCors().getAllowedOrigins()));
+    LOG.debug("CORS allowed origin patterns: {}", () -> toJson(config.getCors().getAllowedOriginPatterns()));
+    LOG.debug("CORS allowed methods: {}", () -> toJson(config.getCors().getAllowedMethods()));
+    LOG.debug("CORS allowed headers: {}", () -> toJson(config.getCors().getAllowedHeaders()));
+    LOG.debug("CORS exposed headers: {}", () -> toJson(config.getCors().getExposedHeaders()));
+    LOG.debug("CORS allow credentials: {}", () -> config.getCors().isAllowCredentials());
+    LOG.debug("CORS max age (seconds): {}", () -> config.getCors().getMaxAgeSeconds());
+
     LOG.debug("Init finished");
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration corsConfig = new CorsConfiguration();
+    corsConfig.setAllowedOrigins(config.getCors().getAllowedOrigins());
+    corsConfig.setAllowedOriginPatterns(config.getCors().getAllowedOriginPatterns());
+    corsConfig.setAllowedMethods(config.getCors().getAllowedMethods());
+    corsConfig.setAllowedHeaders(config.getCors().getAllowedHeaders());
+    corsConfig.setExposedHeaders(config.getCors().getExposedHeaders());
+    corsConfig.setAllowCredentials(config.getCors().isAllowCredentials());
+    corsConfig.setMaxAge(config.getCors().getMaxAgeSeconds());
+
+    UrlBasedCorsConfigurationSource corsConfigSource = new UrlBasedCorsConfigurationSource();
+    corsConfigSource.registerCorsConfiguration("/**", corsConfig);
+
+    return corsConfigSource;
+  }
+
+  @Bean
+  public CorsFilter corsFilter() {
+    return new CorsFilter(corsConfigurationSource()) {
+      @PostConstruct
+      public void init() {
+        LOG.debug("Init started");
+        LOG.debug("Init finished");
+      }
+    };
   }
 
   @Override
@@ -93,6 +143,7 @@ public class WwwSecurityConfig extends BaseAuthSecurityConfig {
 
         /* Sign Out */
         .logout()
+          .addLogoutHandler(securityController)
           .logoutRequestMatcher(new AntPathRequestMatcher("/security/auth", DELETE.name()))
           .logoutSuccessUrl("/")
           .and()

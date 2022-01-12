@@ -25,19 +25,10 @@ management:
           - "http://local.openease.com:[*]"
           - "http://localhost:[*]"
         allowed-methods:
-          - "HEAD"
-          - "GET"
-          - "POST"
-          - "PUT"
-          - "DELETE"
-          - "PATCH"
-          - "OPTIONS"
+          - "*"
         allowed-headers:
-          - "X-Requested-With"
-          - "Content-Type"
-          - "Accept"
-          - "Origin"
-        exposed-headers:
+          - "*"
+        exposed-headers: [ ]
         allow-credentials: true
         max-age: 3600
   endpoint:
@@ -69,16 +60,17 @@ spring:
               - "email"
               - "openid"
               - "profile"
-#          apple:
-#            client-id: "..."
-#            client-secret: "..."
-#            redirect-uri: "{baseUrl}/security/auth/oauth2/callback/{registrationId}"
-#            authorization-grant-type: "authorization_code"
-#            client-authentication-method: "post"
-#            scope:
-#              - "email"
-#              - "openid"
-#              - "name"
+          apple:
+            client-name: "Apple"
+            client-id: "..."
+            client-secret: "${OAUTH2_APPLE_CLIENT_SECRET}"
+            redirect-uri: "{baseUrl}/security/auth/oauth2/callback/{registrationId}"
+            authorization-grant-type: "authorization_code"
+            client-authentication-method: "post"
+            scope:
+              - "email"
+              - "openid"
+              - "name"
 #          facebook:
 #            client-id: "..."
 #            client-secret: "..."
@@ -86,12 +78,12 @@ spring:
 #            scope:
 #              - "email"
 #              - "public_profile"
-#        provider:
-#          apple:
-#            authorization-uri: "https://appleid.apple.com/auth/authorize?response_mode=form_post"
-#            token-uri: "https://appleid.apple.com/auth/token"
-#            jwk-set-uri: "https://appleid.apple.com/auth/keys"
-#            user-name-attribute: "sub"
+        provider:
+          apple:
+            authorization-uri: "https://appleid.apple.com/auth/authorize?response_mode=form_post"
+            token-uri: "https://appleid.apple.com/auth/token"
+            jwk-set-uri: "https://appleid.apple.com/auth/keys"
+            user-name-attribute: "sub"
 #          facebook:
 #            authorization-uri: "https://www.facebook.com/v3.0/dialog/oauth"
 #            token-uri: "https://graph.facebook.com/v3.0/oauth/access_token"
@@ -148,17 +140,12 @@ config:
       - "https://*.openease.com:[*]"
       - "http://local.openease.com:[*]"
       - "http://localhost:[*]"
+      - "https://appleid.apple.com"
     allowed-methods:
-      - "HEAD"
-      - "GET"
-      - "POST"
-      - "PUT"
-      - "DELETE"
-      - "PATCH"
-      - "OPTIONS"
+      - "*"
     allowed-headers:
       - "*"
-    exposed-headers:
+    exposed-headers: [ ]
     allow-credentials: true
     max-age-seconds: 3600
 
@@ -173,7 +160,19 @@ config:
       # /security/auth/oauth2/authorize request.
       authorized-redirect-uris:
         - "http://localhost:3000/security/auth/oauth2/redirect"
+        - "https://local-ui.openease.com/security/auth/oauth2/redirect"
         - "myexampleapp:///security/auth/oauth2/redirect"
+      provider:
+        APPLE:
+          client-id: "..."
+          team-id: "..."
+          key-id: "..."
+          private-key: |
+            -----BEGIN PRIVATE KEY-----
+            ...
+            -----END PRIVATE KEY-----
+          audience: "https://appleid.apple.com"
+          jwt-signature-algorithm: "ES256"
 
   test-accounts:
     ADMIN:

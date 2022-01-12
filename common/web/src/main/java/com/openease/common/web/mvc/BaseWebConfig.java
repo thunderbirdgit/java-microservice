@@ -47,6 +47,7 @@ public abstract class BaseWebConfig implements WebMvcConfigurer, ApplicationCont
         .allowedOriginPatterns(config.getCors().getAllowedOriginPatterns().toArray(String[]::new))
         .allowedMethods(config.getCors().getAllowedMethods().toArray(String[]::new))
         .allowedHeaders(config.getCors().getAllowedHeaders().toArray(String[]::new))
+        .exposedHeaders(config.getCors().getExposedHeaders().toArray(String[]::new))
         .allowCredentials(config.getCors().isAllowCredentials())
         .maxAge(config.getCors().getMaxAgeSeconds());
   }

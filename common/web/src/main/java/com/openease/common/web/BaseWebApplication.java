@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +19,7 @@ import org.springframework.core.env.PropertySources;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import static com.openease.common.util.JsonPasswordSerializer.MASK;
@@ -68,7 +68,17 @@ public abstract class BaseWebApplication extends SpringBootServletInitializer im
 
   public static void start(Class clazz, String... args) {
     LOG.info("Starting up ...");
-    applicationContext = SpringApplication.run(clazz, args);
+    applicationContext = new SpringApplicationBuilder(clazz)
+        .build()
+        .run(args);
+  }
+
+  public static void start(Class clazz, Properties properties, String... args) {
+    LOG.info("Starting up ...");
+    applicationContext = new SpringApplicationBuilder(clazz)
+        .properties(properties)
+        .build()
+        .run(args);
   }
 
   @Override

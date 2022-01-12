@@ -56,7 +56,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     LOG.debug("HTTP Request: {} {}", httpRequest::getMethod, httpRequest::getRequestURL);
 
     if (authentication != null) {
-      LOG.debug("Authentication is of type: {}", () -> authentication.getClass().getSimpleName());
+      LOG.debug("{} is of type: {}", Authentication.class::getSimpleName, () -> authentication.getClass().getSimpleName());
       if (authentication instanceof OAuth2AuthenticationToken) {
         OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
 
@@ -71,7 +71,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         OAuth2User oAuth2User = authenticationToken.getPrincipal();
-        oAuth2AccountManager.createOrUpdateAccountFromOAuth2User(oAuth2User, oAuth2Provider);
+        oAuth2AccountManager.createOrUpdateAccountFromOAuth2User(httpRequest, oAuth2User, oAuth2Provider);
       } else {
         LOG.error("Authentication is *not* of type: {}", OAuth2AuthenticationToken.class::getSimpleName);
         throw new OAuth2AuthenticationException("Authentication is *not* of type: " + OAuth2AuthenticationToken.class.getSimpleName());

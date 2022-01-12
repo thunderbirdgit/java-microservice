@@ -43,7 +43,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
         .orElse(("/"));
 
     redirectUrl = UriComponentsBuilder.fromUriString(redirectUrl)
-        .queryParam("error", URLEncoder.encode(exception.getLocalizedMessage(), UTF_8.toString()))
+        .queryParam("error", URLEncoder.encode("" + exception.getLocalizedMessage(), UTF_8))
         .build().toUriString();
 
     String finalRedirectUrl = redirectUrl;

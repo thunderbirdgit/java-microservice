@@ -78,6 +78,7 @@ public abstract class BaseAuthSecurityConfig extends BaseSecurityConfig {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     super.configure(http);
+
     http
 
         /* Security Management */

@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
@@ -40,10 +41,16 @@ public class JwtManager {
   @Autowired
   private Config config;
 
+  @PostConstruct
+  public void init() {
+    LOG.debug("Init started");
+    LOG.debug("Init finished");
+  }
+
   public String createJwt(Authentication authentication) throws GeneralManagerException {
     String token = null;
 
-    String username = null;
+    String username;
     if (authentication == null) {
       LOG.trace("No authentication provided");
       throw new GeneralManagerException(MANAGER_JWT_ERROR_GENERALFAILURE, "No authentication provided");
@@ -56,7 +63,7 @@ public class JwtManager {
           Account account = (Account) principal;
           username = account.getUsername();
           LOG.trace("{}: {}", () -> account.getClass().getSimpleName(), account::toStringUsingMixIn);
-        } else if (principal instanceof OidcUser) {  // Google account
+        } else if (principal instanceof OidcUser) { // Google/Apple account
           OidcUser oidcUser = (OidcUser) principal;
           username = oidcUser.getEmail();
           LOG.trace("{}: {}", () -> oidcUser.getClass().getSimpleName(), () -> toJson(oidcUser, true));
@@ -70,6 +77,7 @@ public class JwtManager {
       }
     }
 
+    LOG.debug("username: {}", () -> username);
     if (username != null) {
       long now = System.currentTimeMillis();
       long expiry = now + Duration.ofSeconds(config.getAuth().getJwtExpirationSeconds()).toMillis();
