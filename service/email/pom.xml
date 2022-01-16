@@ -63,6 +63,7 @@
         <configuration>
           <systemPropertyVariables>
             <com.openease.env>${openease.env}</com.openease.env>
+            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
             <log4j2.configurationFile>log4j2-${openease.env}.yaml</log4j2.configurationFile>
           </systemPropertyVariables>
         </configuration>

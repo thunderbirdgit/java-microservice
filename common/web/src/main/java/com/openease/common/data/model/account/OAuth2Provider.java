@@ -10,8 +10,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public enum OAuth2Provider {
 
   GOOGLE,
-  APPLE,
-  FACEBOOK;
+  APPLE;
+//  FACEBOOK;
+
+  public static final String OAUTH2_APPLE_CLIENT_SECRET = "OAUTH2_APPLE_CLIENT_SECRET";
 
   public static class AdditionalDetails {
     private String clientId;
@@ -20,6 +22,7 @@ public enum OAuth2Provider {
     private String privateKey;
     private String audience;
     private SignatureAlgorithm jwtSignatureAlgorithm;
+    private int jwtExpirationDays;
 
     public String getClientId() {
       return clientId;
@@ -74,8 +77,30 @@ public enum OAuth2Provider {
       this.jwtSignatureAlgorithm = jwtSignatureAlgorithm;
       return this;
     }
+
+    public int getJwtExpirationDays() {
+      return jwtExpirationDays;
+    }
+
+    public AdditionalDetails setJwtExpirationDays(int jwtExpirationDays) {
+      this.jwtExpirationDays = jwtExpirationDays;
+      return this;
+    }
   }
 
+  /**
+   * Apple OAuth 2.0 sign-in returns these user details as a parameter in the
+   * HTTP POST callback, but the user's name is only returned on the very
+   * first time the user signs in.
+   * Apple documentation:
+   * <pre>
+   *   When someone uses your app and Sign in with Apple for the very first time,
+   *   the identification servers return the user status. Subsequent attempts do
+   *   not return the user status.
+   * </pre>
+   *
+   * @see <a href="https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/authenticating_users_with_sign_in_with_apple">Apple Developer | OAuth 2.0 | Sign-in</a>
+   */
   public static class AppleUserDetails {
     private Name name;
     private String email;

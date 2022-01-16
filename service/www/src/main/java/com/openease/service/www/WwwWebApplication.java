@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.openease.common.data.model.account.OAuth2Provider.OAUTH2_APPLE_CLIENT_SECRET;
 import static com.openease.common.util.JsonUtils.toJson;
 
 /**
@@ -46,6 +47,26 @@ public class WwwWebApplication extends BaseWebApplication {
     start(WwwWebApplication.class, oAuth2AppleProperties, args);
   }
 
+  /**
+   * Creates a (dynamic) signed JSON Web Token (JWT) {@link OAUTH2_APPLE_CLIENT_SECRET}
+   * for Apple OAuth 2.0 sign-in, to be injected into the (static) OAuth 2.0
+   * property: {@code spring.security.oauth2.client.registration.apple.client-secret}
+   * <b>application.yaml</b>:
+   * <pre>
+   *   spring:
+   *     security:
+   *       oauth2:
+   *         client:
+   *           registration:
+   *             apple:
+   *               client-secret: "${OAUTH2_APPLE_CLIENT_SECRET:...}"
+   * </pre>
+   * This dynamic JWT creation needs to done before the Spring Boot application
+   * starts because it needs to be injected into Spring's static OAuth 2.0 run-time
+   * bean configuration.
+   *
+   * @return Apple OAuth 2.0 sign-in {@link Properties} (containing client secret JWT)
+   */
   @SuppressWarnings("unchecked")
   private static Properties createOAuth2AppleProperties() {
     BufferedReader applicationConfigReader = ResourceUtils.readResourceIntoBufferedReader("/application.yaml");
@@ -67,7 +88,16 @@ public class WwwWebApplication extends BaseWebApplication {
     headers.put("kid", appleOAuth2Details.get("key-id").toString());
     headers.put("alg", signatureAlgorithm);
 
+    int jwtExpirationDays;
+    try {
+      String jwtExpirationDaysStr = appleOAuth2Details.get("jwt-expiration-days").toString();
+      jwtExpirationDays = Integer.parseInt(jwtExpirationDaysStr);
+    } catch (NumberFormatException nfe) {
+      // default
+      jwtExpirationDays = 180;
+    }
     Date now = new Date();
+    Date expiry = DateUtils.addDays(now, jwtExpirationDays);
 
     String clientSecret = Jwts.builder()
         .setHeader(headers)
@@ -76,12 +106,12 @@ public class WwwWebApplication extends BaseWebApplication {
         .setAudience(appleOAuth2Details.get("audience").toString())
         .setIssuedAt(now)
         // set expiration to maximum 6 months ahead
-        .setExpiration(DateUtils.addDays(now, 180))
+        .setExpiration(expiry)
         .signWith(privateKey, signatureAlgorithm)
         .compact();
 
     Properties properties = new Properties();
-    properties.setProperty("OAUTH2_APPLE_CLIENT_SECRET", clientSecret);
+    properties.setProperty(OAUTH2_APPLE_CLIENT_SECRET, clientSecret);
     return properties;
   }
 

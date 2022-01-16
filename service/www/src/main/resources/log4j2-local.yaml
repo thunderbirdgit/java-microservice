@@ -19,7 +19,17 @@ configuration:
         additivity: false
         appenderRef:
           - ref: "LogToConsole"
-#      - name: "org.springframework.security"
+#      - name: "org.springframework.security.web"
+#        level: "trace"
+#        additivity: false
+#        appenderRef:
+#          - ref: "LogToConsole"
+#      - name: "org.springframework.security.oauth2"
+#        level: "trace"
+#        additivity: false
+#        appenderRef:
+#          - ref: "LogToConsole"
+#      - name: "org.springframework.web.cors"
 #        level: "trace"
 #        additivity: false
 #        appenderRef:

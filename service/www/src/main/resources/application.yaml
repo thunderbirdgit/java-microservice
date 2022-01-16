@@ -63,7 +63,7 @@ spring:
           apple:
             client-name: "Apple"
             client-id: "..."
-            client-secret: "${OAUTH2_APPLE_CLIENT_SECRET}"
+            client-secret: "${OAUTH2_APPLE_CLIENT_SECRET:...}"
             redirect-uri: "{baseUrl}/security/auth/oauth2/callback/{registrationId}"
             authorization-grant-type: "authorization_code"
             client-authentication-method: "post"
@@ -173,6 +173,8 @@ config:
             -----END PRIVATE KEY-----
           audience: "https://appleid.apple.com"
           jwt-signature-algorithm: "ES256"
+          # set expiration to maximum 6 months ahead
+          jwt-expiration-days: 180
 
   test-accounts:
     ADMIN:

@@ -95,6 +95,7 @@
                   <alias>${project.artifactId}</alias>
                   <build>
                     <dockerFile>${project.build.directory}/Dockerfile</dockerFile>
+                    <imagePullPolicy>Always</imagePullPolicy>
                   </build>
                 </image>
               </images>

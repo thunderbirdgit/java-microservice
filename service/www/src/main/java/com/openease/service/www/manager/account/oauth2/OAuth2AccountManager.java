@@ -100,9 +100,9 @@ public class OAuth2AccountManager extends DefaultOAuth2UserService {
           case APPLE:
             updateAccountWithAppleDetails(oAuth2Account, httpRequest);
             break;
-          case FACEBOOK:
-            updateAccountWithFacebookDetails(oAuth2Account);
-            break;
+//TODO:          case FACEBOOK:
+//            updateAccountWithFacebookDetails(oAuth2Account);
+//            break;
         }
 
         // prune attributes

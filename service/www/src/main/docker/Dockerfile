@@ -14,4 +14,4 @@ ADD ./@project.build.finalName@-@classifier.executable@.@project.packaging@ ${OP
 
 EXPOSE @service.port@
 
-CMD [ "/bin/sh", "-c", "${JDK_HOME}/bin/java ${JVM_OPTS} -D@environment.systemProperty@=${OPENEASE_ENV} -Dlog4j2.configurationFile=log4j2-${OPENEASE_ENV}.yaml -jar ${OPENEASE_HOME}/@project.build.finalName@-@classifier.executable@.@project.packaging@" ]
+CMD [ "/bin/sh", "-c", "${JDK_HOME}/bin/java ${JVM_OPTS} -D@environment.systemProperty@=${OPENEASE_ENV} -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dlog4j2.configurationFile=log4j2-${OPENEASE_ENV}.yaml -jar ${OPENEASE_HOME}/@project.build.finalName@-@classifier.executable@.@project.packaging@" ]

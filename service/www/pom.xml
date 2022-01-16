@@ -105,6 +105,7 @@
         <configuration>
           <systemPropertyVariables>
             <com.openease.env>${openease.env}</com.openease.env>
+            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
             <log4j2.configurationFile>log4j2-${openease.env}.yaml</log4j2.configurationFile>
           </systemPropertyVariables>
         </configuration>
@@ -122,7 +123,7 @@
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <configuration>
-          <nodeVersion>v16.13.1</nodeVersion>
+          <nodeVersion>v16.13.2</nodeVersion>
           <installDirectory>${project.build.directory}</installDirectory>
           <workingDirectory>${project.build.directory}/javascript</workingDirectory>
         </configuration>
