@@ -407,7 +407,7 @@ public class AccountsController extends BaseApiController {
   }
 
   public String getResetPasswordApiUrl() {
-    return config.getUrlWithCurrentApiVersion() + RESETPASSWORD_CONTEXT_ABSOLUTE;
+    return config.getCurrentApiContext() + RESETPASSWORD_CONTEXT_ABSOLUTE;
   }
 
 }

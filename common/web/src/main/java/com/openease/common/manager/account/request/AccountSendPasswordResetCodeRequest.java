@@ -20,7 +20,7 @@ public class AccountSendPasswordResetCodeRequest extends BaseManagerModel {
   @Email(message = "{" + VALIDATION_EMAIL_INVALID + "}")
   private String email;
 
-  @NotBlank(message = "{" + VALIDATION_CAPTCHAVERIFYREQUEST_USERTOKEN_NOTBLANK + "}")
+//  @NotBlank(message = "{" + VALIDATION_CAPTCHAVERIFYREQUEST_USERTOKEN_NOTBLANK + "}")
   private String captchaUserToken;
 
   public String getEmail() {

@@ -519,7 +519,11 @@ public class Config {
   }
 
   public String getUrlWithCurrentApiVersion() {
-    return getFullyQualifiedUrl(ApiVersion.Constants.CURRENT_VERSION_CONTEXT);
+    return getFullyQualifiedUrl(getCurrentApiContext());
+  }
+
+  public String getCurrentApiContext() {
+    return ApiVersion.Constants.CURRENT_VERSION_CONTEXT;
   }
 
 }
