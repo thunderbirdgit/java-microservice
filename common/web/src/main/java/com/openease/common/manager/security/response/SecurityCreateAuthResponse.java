@@ -10,21 +10,21 @@ import com.openease.common.manager.base.model.BaseManagerModel;
  */
 public class SecurityCreateAuthResponse extends BaseManagerModel implements HasAccountId<SecurityCreateAuthResponse> {
 
-  private String jwt;
+  private String token;
 
   private String accountId;
 
   public SecurityCreateAuthResponse() {
-    this.jwt = null;
+    this.token = null;
     this.accountId = null;
   }
 
-  public String getJwt() {
-    return jwt;
+  public String getToken() {
+    return token;
   }
 
-  public SecurityCreateAuthResponse setJwt(String jwt) {
-    this.jwt = jwt;
+  public SecurityCreateAuthResponse setToken(String token) {
+    this.token = token;
     return this;
   }
 

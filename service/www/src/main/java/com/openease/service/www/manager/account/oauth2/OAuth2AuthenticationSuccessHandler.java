@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static com.openease.common.web.util.HttpUtils.getCookie;
 import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.upperCase;
 
@@ -93,7 +94,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
   }
 
   @Override
-  protected String determineTargetUrl(HttpServletRequest httpRequest, HttpServletResponse response, Authentication authentication) {
+  protected String determineTargetUrl(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Authentication authentication) {
     Optional<String> redirectUri = getCookie(httpRequest, REDIRECT_URI)
         .map(Cookie::getValue);
 
@@ -119,26 +120,33 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         .build().toUriString();
   }
 
-  protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+  protected void clearAuthenticationAttributes(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
     LOG.debug("Clear authentication attributes");
-    super.clearAuthenticationAttributes(request);
-    httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+    super.clearAuthenticationAttributes(httpRequest);
+    httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(httpRequest, httpResponse);
   }
 
   private boolean isRedirectUriAuthorized(String uri) {
     boolean authorized = false;
 
+    LOG.trace("Verify redirect URI is authorized: {}", () -> uri);
     if (isNotBlank(uri)) {
       URI clientRedirectUri = URI.create(uri);
       authorized = config.getAuth().getOAuth2().getAuthorizedRedirectUris()
           .stream()
           .anyMatch(redirectUri -> {
+            LOG.trace("Match against: {}", () -> redirectUri);
             // validate only host and port (let client use different path if desired)
             URI authorizedRedirectUri = URI.create(redirectUri);
-            return authorizedRedirectUri.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+            LOG.trace("... scheme: {}", authorizedRedirectUri::getScheme);
+            LOG.trace("... host: {}", authorizedRedirectUri::getHost);
+            LOG.trace("... port: {}", authorizedRedirectUri::getPort);
+            return equalsIgnoreCase(authorizedRedirectUri.getScheme(), clientRedirectUri.getScheme())
+                && equalsIgnoreCase(authorizedRedirectUri.getHost(), clientRedirectUri.getHost())
                 && authorizedRedirectUri.getPort() == clientRedirectUri.getPort();
           });
     }
+    LOG.trace("Redirect URI is authorized: {}", authorized);
 
     return authorized;
   }

@@ -82,7 +82,7 @@ public class SecurityManager {
 
     // set response
     response = new SecurityCreateAuthResponse()
-        .setJwt(jwt)
+        .setToken(jwt)
         .setAccountId(account.getId());
 
     LOG.debug("response: {}", response);

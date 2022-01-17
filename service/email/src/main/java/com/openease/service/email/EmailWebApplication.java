@@ -16,7 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
     "com.openease.common.util",
     "com.openease.common.config",
     "com.openease.common.web.lang",
-    "com.openease.common.service.elasticsearch",
+//    "com.openease.common.service.elasticsearch",
     "com.openease.common.manager.info",
     "com.openease.common.web.filter",
     "com.openease.common.web.task",

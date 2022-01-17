@@ -19,6 +19,7 @@ import java.net.URLEncoder;
 import static com.openease.common.web.util.HttpUtils.getCookie;
 import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * OAuth 2.0 {@link AuthenticationFailureHandler}
@@ -38,12 +39,18 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
     LOG.debug("HTTP Request: {} {}", httpRequest::getMethod, httpRequest::getRequestURL);
     LOG.warn("{}: {}", () -> exception.getClass().getSimpleName(), exception::getMessage);
 
+    String errorMessage = "error";
+    String exceptionMessage = exception.getLocalizedMessage();
+    if (isNotBlank(exceptionMessage)) {
+      errorMessage += ": " + exceptionMessage;
+    }
+
     String redirectUrl = getCookie(httpRequest, REDIRECT_URI)
         .map(Cookie::getValue)
         .orElse(("/"));
 
     redirectUrl = UriComponentsBuilder.fromUriString(redirectUrl)
-        .queryParam("error", URLEncoder.encode("" + exception.getLocalizedMessage(), UTF_8))
+        .queryParam("error", URLEncoder.encode(errorMessage, UTF_8))
         .build().toUriString();
 
     String finalRedirectUrl = redirectUrl;
