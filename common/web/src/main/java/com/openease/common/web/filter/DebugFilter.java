@@ -1,10 +1,7 @@
 package com.openease.common.web.filter;
 
-import com.openease.common.manager.exception.GeneralManagerException;
-import com.openease.common.manager.log.EventLogManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -20,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.openease.common.util.JsonUtils.toJson;
-import static com.openease.common.web.security.BaseAuthSecurityConfig.getSignedInAccount;
 import static com.openease.common.web.util.HttpUtils.getHeadersAsString;
 import static com.openease.common.web.util.HttpUtils.getIpAddress;
 import static com.openease.common.web.util.HttpUtils.getUserAgentDetails;
@@ -41,9 +37,6 @@ public class DebugFilter implements Filter {
 
   @Value("${config.filters.debug.enabled}")
   private boolean enabled;
-
-  @Autowired
-  private EventLogManager eventLogManager;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -67,12 +60,6 @@ public class DebugFilter implements Filter {
             : "";
         LOG.debug("[IP:{}] HTTP Request:{}  HTTP {} {}{}{}  Headers:{}{}", () -> ipAddress, System::lineSeparator, httpRequest::getMethod, httpRequest::getRequestURL, () -> queryString, System::lineSeparator, System::lineSeparator, () -> getHeadersAsString(httpRequest, "    "));
         LOG.debug("User Agent: {}", () -> toJson(getUserAgentDetails(httpRequest), true));
-      }
-
-      try {
-        eventLogManager.create(httpRequest, getSignedInAccount());
-      } catch (GeneralManagerException me) {
-        LOG.error(me::getMessage, me);
       }
 
       // continue filter chain

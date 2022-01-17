@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -72,6 +73,7 @@ import static org.apache.commons.lang3.StringUtils.trim;
  * @author Alan Czajkowski
  */
 @Service
+@DependsOn({"elasticsearchEmbeddedServer"})
 public class AccountManager implements UserDetailsService, UserDetailsPasswordService {
 
   private static final transient Logger LOG = LogManager.getLogger(AccountManager.class);

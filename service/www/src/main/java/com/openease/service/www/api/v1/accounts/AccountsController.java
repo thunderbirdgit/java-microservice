@@ -11,6 +11,7 @@ import com.openease.common.manager.account.request.AccountUpdatePasswordRequest;
 import com.openease.common.manager.account.response.AccountUpdateResponse;
 import com.openease.common.manager.exception.GeneralManagerException;
 import com.openease.common.manager.jwt.JwtManager;
+import com.openease.common.manager.log.EventLogManager;
 import com.openease.common.manager.security.SecurityManager;
 import com.openease.common.web.api.base.BaseApiController;
 import com.openease.common.web.api.base.exception.ApiException;
@@ -84,6 +85,9 @@ public class AccountsController extends BaseApiController {
   @Autowired
   private JwtManager jwtManager;
 
+  @Autowired
+  private EventLogManager eventLogManager;
+
   @PostConstruct
   public void init() {
     LOG.debug("Init started");
@@ -113,7 +117,7 @@ public class AccountsController extends BaseApiController {
       throw new ApiException(me);
     }
 
-    createEventLog(httpRequest, "Account created", null, account);
+    createEventLog(eventLogManager, httpRequest, "Account created", null, account);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -150,7 +154,7 @@ public class AccountsController extends BaseApiController {
       }
     }
 
-    createEventLog(httpRequest, "Account read", null, account);
+    createEventLog(eventLogManager, httpRequest, "Account read", null, account);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -203,7 +207,7 @@ public class AccountsController extends BaseApiController {
       }
     }
 
-    createEventLog(httpRequest, "Account updated", null, account);
+    createEventLog(eventLogManager, httpRequest, "Account updated", null, account);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -233,7 +237,7 @@ public class AccountsController extends BaseApiController {
       }
     }
 
-    createEventLog(httpRequest, "Account disabled", null, account);
+    createEventLog(eventLogManager, httpRequest, "Account disabled", null, account);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -259,7 +263,7 @@ public class AccountsController extends BaseApiController {
       }
     }
 
-    createEventLog(httpRequest, "Account sent verification code", null, account);
+    createEventLog(eventLogManager, httpRequest, "Account sent verification code", null, account);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -313,7 +317,7 @@ public class AccountsController extends BaseApiController {
       }
     }
 
-    createEventLog(httpRequest, "Account updated password", null, account);
+    createEventLog(eventLogManager, httpRequest, "Account updated password", null, account);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -332,7 +336,7 @@ public class AccountsController extends BaseApiController {
 
     SuccessApiResponse response = createSuccessApiResponse();
 
-    createEventLog(httpRequest, "Checked username (email) available", request.getEmail(), null);
+    createEventLog(eventLogManager, httpRequest, "Checked username (email) available", request.getEmail(), null);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -365,7 +369,7 @@ public class AccountsController extends BaseApiController {
       }
     }
 
-    createEventLog(httpRequest, "Account sent password reset code", request.getEmail(), account);
+    createEventLog(eventLogManager, httpRequest, "Account sent password reset code", request.getEmail(), account);
     LOG.trace("response: {}", response);
     return response;
   }
@@ -392,7 +396,7 @@ public class AccountsController extends BaseApiController {
       }
     }
 
-    createEventLog(httpRequest, "Account reset password", null, account);
+    createEventLog(eventLogManager, httpRequest, "Account reset password", null, account);
     LOG.trace("response: {}", response);
     return response;
   }

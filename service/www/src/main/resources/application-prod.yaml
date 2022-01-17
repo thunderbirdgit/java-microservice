@@ -21,7 +21,7 @@ manager:
       baseUrl: "https://email.openease.com/v1/emails"
   remoteSms:
     api:
-      baseUrl: "http://sms.openease.com/v1/sms"
+      baseUrl: "https://sms.openease.com/v1/sms"
   remotePayment:
     api:
       baseUrl: "https://payment.openease.com/v1/payments"

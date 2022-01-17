@@ -2,6 +2,7 @@ package com.openease.service.www.api.security;
 
 import com.openease.common.data.model.account.Account;
 import com.openease.common.manager.exception.GeneralManagerException;
+import com.openease.common.manager.log.EventLogManager;
 import com.openease.common.manager.security.SecurityManager;
 import com.openease.common.manager.security.request.SecurityCreateAuthRequest;
 import com.openease.common.manager.security.response.SecurityCreateAuthResponse;
@@ -51,6 +52,9 @@ public class SecurityController extends BaseApiController implements LogoutHandl
   @Autowired
   private SecurityManager securityManager;
 
+  @Autowired
+  private EventLogManager eventLogManager;
+
   @PostConstruct
   public void init() {
     LOG.debug("Init started");
@@ -87,7 +91,7 @@ public class SecurityController extends BaseApiController implements LogoutHandl
       }
     }
 
-    createEventLog(httpRequest, "Account signed in", null, getSignedInAccount());
+    createEventLog(eventLogManager, httpRequest, "Account signed in", null, getSignedInAccount());
     LOG.trace("response: {}", response);
     return response;
   }
@@ -105,7 +109,7 @@ public class SecurityController extends BaseApiController implements LogoutHandl
     securityManager.delete();
     response = createSuccessApiResponse(messageSource, CRUD_DELETE_SUCCESS);
 
-    createEventLog(httpRequest, "Account signed out", null, signedInAccount);
+    createEventLog(eventLogManager, httpRequest, "Account signed out", null, signedInAccount);
     LOG.trace("response: {}", response);
     return response;
   }

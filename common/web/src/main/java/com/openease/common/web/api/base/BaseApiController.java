@@ -76,9 +76,6 @@ public abstract class BaseApiController {
 //TODO:  @Autowired
 //TODO:  protected CaptchaManager captchaManager;
 
-  @Autowired
-  protected EventLogManager eventLogManager;
-
   //TODO: Captcha
   protected void verifyCaptcha(String captchaUserToken, HttpServletRequest httpRequest) {
 //    LOG.debug("Verify Captcha");
@@ -275,7 +272,7 @@ public abstract class BaseApiController {
     return responseEntity;
   }
 
-  protected void createEventLog(HttpServletRequest httpRequest, String description, String rawData, Account account) {
+  protected void createEventLog(EventLogManager eventLogManager, HttpServletRequest httpRequest, String description, String rawData, Account account) {
     try {
       eventLogManager.create(httpRequest, description, rawData, account);
     } catch (GeneralManagerException me) {

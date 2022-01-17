@@ -14,8 +14,8 @@ import javax.annotation.PostConstruct;
  * @author Alan Czajkowski
  */
 @Configuration
-@EnableElasticsearchRepositories({"com.openease.common.data.dao.log"})
-@DependsOn({"elasticsearchEmbeddedServer"})
+//@EnableElasticsearchRepositories({"com.openease.common.data.dao.log"})
+//@DependsOn({"elasticsearchEmbeddedServer"})
 public class SmsDataConfig {
 
   private static final transient Logger LOG = LogManager.getLogger(SmsDataConfig.class);

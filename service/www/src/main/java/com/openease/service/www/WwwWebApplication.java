@@ -36,7 +36,9 @@ import static com.openease.common.util.JsonUtils.toJson;
  */
 @EnableAutoConfiguration
 @SpringBootConfiguration
-@ComponentScan({"com.openease.*"})
+@ComponentScan({
+    "com.openease.*"
+})
 public class WwwWebApplication extends BaseWebApplication {
 
   private static final transient Logger LOG = LogManager.getLogger(WwwWebApplication.class);

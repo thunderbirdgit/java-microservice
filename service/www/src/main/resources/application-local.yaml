@@ -33,6 +33,6 @@ manager:
       baseUrl: "http://host.docker.internal:8280/v1/sms"
   remotePayment:
     api:
-      baseUrl: "https://host.docker.internal:8380/v1/payments"
+      baseUrl: "http://host.docker.internal:8380/v1/payments"
   captcha:
     enabled: false
