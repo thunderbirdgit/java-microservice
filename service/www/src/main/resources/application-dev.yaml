@@ -1,3 +1,13 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: "https://@service.name@.dev.openease.com/security/auth/oauth2/callback/{registrationId}"
+          apple:
+            redirect-uri: "https://@service.name@.dev.openease.com/security/auth/oauth2/callback/{registrationId}"
+
 # Config
 config:
   url: "https://@service.name@.dev.openease.com"

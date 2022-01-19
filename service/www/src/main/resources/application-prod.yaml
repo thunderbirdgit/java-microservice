@@ -3,6 +3,15 @@ management:
   endpoint:
     health:
       show-details: "never"
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: "https://@service.name@.openease.com/security/auth/oauth2/callback/{registrationId}"
+          apple:
+            redirect-uri: "https://@service.name@.openease.com/security/auth/oauth2/callback/{registrationId}"
 
 # Config
 config:

@@ -30,7 +30,7 @@ public abstract class BaseSendTemplateEmailTask extends BaseSendEmailTask {
   private static final transient Logger LOG = LogManager.getLogger(BaseSendTemplateEmailTask.class);
 
   protected static final String INLINE_IMAGE_CLASSPATH = STATIC_ASSET_CLASSPATH + "/img/";
-  protected static final String LOGO_FILE_NAME = "openease-logo-email-125x16.png";
+  protected static final String LOGO_FILE_NAME = "openease-logo-basic.png";
   protected static final String LOGO_FILE_CLASSPATH = INLINE_IMAGE_CLASSPATH + LOGO_FILE_NAME;
   protected static final String LOGO_FILE_MIMETYPE = IMAGE_PNG_VALUE;
 

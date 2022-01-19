@@ -14,7 +14,7 @@
 <p>
   <span th:text="#{templates.email.default.farewell}">Regards</span>,<br/>
   <em><span th:text="#{templates.email.default.signature}">The Openease Team</span></em><br/>
-  <img th:src="${#strings.isEmpty(logoFileName) ? '/img/openease-logo-email-125x16.png' : ('cid:' + logoFileName)}" src="./img/openease-logo-email-125x16.png" width="125" height="16" alt="Openease logo"/>
+  <img th:src="${#strings.isEmpty(logoFileName) ? '/img/openease-logo-basic.png' : ('cid:' + logoFileName)}" src="./img/openease-logo-basic.png" width="157" height="20" alt="Openease logo"/>
 </p>
 </body>
 </html>

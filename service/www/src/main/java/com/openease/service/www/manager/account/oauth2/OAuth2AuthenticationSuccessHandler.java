@@ -16,16 +16,20 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Optional;
 
 import static com.openease.common.web.util.HttpUtils.getCookie;
 import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI;
+import static com.openease.service.www.manager.account.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_TOKEN;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.upperCase;
@@ -51,6 +55,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
   @Autowired
   private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+
+  @PostConstruct
+  public void init() {
+    LOG.debug("Init started");
+
+    String defaultTargetUrl = config.getAuth().getOAuth2().getAuthorizedRedirectUris().get(0);
+    LOG.debug("default target URL: {}", () -> defaultTargetUrl);
+    setDefaultTargetUrl(defaultTargetUrl);
+
+    LOG.debug("Init finished");
+  }
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Authentication authentication) throws IOException, ServletException {
@@ -88,7 +103,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     if (httpResponse.isCommitted()) {
       LOG.debug("Response has already been committed. Unable to redirect to: {}", () -> targetUrl);
     } else {
-      clearAuthenticationAttributes(httpRequest, httpResponse);
+      LOG.debug("Clear authentication attributes");
+      super.clearAuthenticationAttributes(httpRequest);
+      httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(httpRequest, httpResponse);
       getRedirectStrategy().sendRedirect(httpRequest, httpResponse, targetUrl);
     }
   }
@@ -99,6 +116,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         .map(Cookie::getValue);
 
     if (redirectUri.isPresent() && !isRedirectUriAuthorized(redirectUri.get())) {
+      LOG.error("Unauthorized redirect URI: {}", redirectUri::get);
       throw new OAuth2AuthenticationException("Unauthorized redirect URI");
     }
 
@@ -116,14 +134,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     return UriComponentsBuilder.fromUriString(targetUrl)
-        .queryParam("token", jwt)
+        .queryParam(REDIRECT_URI_PARAM_TOKEN, URLEncoder.encode(jwt, UTF_8))
         .build().toUriString();
-  }
-
-  protected void clearAuthenticationAttributes(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-    LOG.debug("Clear authentication attributes");
-    super.clearAuthenticationAttributes(httpRequest);
-    httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(httpRequest, httpResponse);
   }
 
   private boolean isRedirectUriAuthorized(String uri) {

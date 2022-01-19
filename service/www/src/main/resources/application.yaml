@@ -138,6 +138,7 @@ config:
     allowed-origin-patterns:
       - "https://openease.com:[*]"
       - "https://*.openease.com:[*]"
+      - "http://local-ui.openease.com:[*]"
       - "http://local.openease.com:[*]"
       - "http://localhost:[*]"
       - "https://appleid.apple.com"
@@ -159,8 +160,9 @@ config:
       # sending this token to the redirect_uri mentioned by the client in the
       # /security/auth/oauth2/authorize request.
       authorized-redirect-uris:
-        - "http://localhost:3000/security/auth/oauth2/redirect"
         - "https://local-ui.openease.com/security/auth/oauth2/redirect"
+        - "http://local-ui.openease.com:3000/security/auth/oauth2/redirect"
+        - "http://localhost:3000/security/auth/oauth2/redirect"
         - "myexampleapp:///security/auth/oauth2/redirect"
       provider:
         APPLE:
@@ -173,7 +175,7 @@ config:
             -----END PRIVATE KEY-----
           audience: "https://appleid.apple.com"
           jwt-signature-algorithm: "ES256"
-          # set expiration to maximum 6 months ahead
+          # set expiration to maximum 6 months ahead (Apple's policy)
           jwt-expiration-days: 180
 
   test-accounts:

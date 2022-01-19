@@ -32,6 +32,8 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
   private static final int HTTP_COOKIE_MAX_AGE_SECONDS = (int) Duration.ofMinutes(3).toSeconds();
   public static final String OAUTH2_AUTHORIZATION_REQUEST = "oauth2_auth_request";
   public static final String REDIRECT_URI = "redirect_uri";
+  public static final String REDIRECT_URI_PARAM_TOKEN = "token";
+  public static final String REDIRECT_URI_PARAM_ERROR = "error";
 
   @PostConstruct
   public void init() {
