@@ -143,7 +143,7 @@ public class Account extends BaseAuditDataModel<Account> implements AccountInter
     this.gender = UNKNOWN;
     this.companyName = null;
     this.imageUrl = null;
-    this.oAuth2 = null;
+    this.oAuth2 = new OAuth2();
   }
 
   @Override

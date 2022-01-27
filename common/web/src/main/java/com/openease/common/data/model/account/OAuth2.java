@@ -1,5 +1,7 @@
 package com.openease.common.data.model.account;
 
+import com.openease.common.data.model.base.BaseModel;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +10,7 @@ import java.util.Map;
  *
  * @author Alan Czajkowski
  */
-public class OAuth2 {
+public class OAuth2 extends BaseModel<OAuth2> {
 
   private OAuth2Provider provider;
 
