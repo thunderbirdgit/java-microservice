@@ -272,7 +272,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     }
 
     // update account phone number
-    if (Objects.equals(accountScrubbed.getPhoneNumber(), accountToUpdate.getPhoneNumber())) {
+    if (!Objects.equals(accountScrubbed.getPhoneNumber(), accountToUpdate.getPhoneNumber())) {
       LOG.debug("Account phone number changed");
       LOG.debug("Verify current password");
       verifyPassword(accountToUpdate, accountScrubbed.getPasswordVerification());
