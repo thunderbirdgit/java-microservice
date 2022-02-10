@@ -155,4 +155,4 @@ manager:
     prefix: "/WEB-INF/thymeleaf/templates"
   image:
     cache:
-      size: 2
+      size: 100
