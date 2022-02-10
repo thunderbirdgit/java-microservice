@@ -1,0 +1,5 @@
+[(${logoAscii})]
+# [(#{application.name})]
+# [(#{application.version})]
+
+[(#{application.copyright})]

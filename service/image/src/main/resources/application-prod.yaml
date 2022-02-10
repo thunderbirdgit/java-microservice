@@ -1,0 +1,18 @@
+# Spring Boot
+management:
+  endpoint:
+    health:
+      show-details: "never"
+
+# Config
+config:
+  url: "https://@service.name@.openease.com"
+  mask-5xx-errors: true
+  filters:
+    debug:
+      enabled: false
+
+# Managers
+manager:
+  event-log:
+    enabled: true

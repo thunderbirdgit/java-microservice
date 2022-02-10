@@ -19,6 +19,7 @@
     <module>payment</module>
     <module>sms</module>
     <module>email</module>
+    <module>image</module>
     <module>www</module>
   </modules>
 

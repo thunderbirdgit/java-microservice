@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.openease</groupId>
+    <artifactId>java-microservice-example-service</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>java-microservice-example-service-image</artifactId>
+
+  <packaging>war</packaging>
+
+  <name>Java Microservice Example - Service - Image</name>
+  <description>${project.name}</description>
+
+  <properties>
+
+    <service.name>image</service.name>
+    <service.port>8480</service.port>
+    <docker.artifactId>service-${service.name}</docker.artifactId>
+
+  </properties>
+
+  <dependencies>
+
+    <!-- # Openease -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>java-microservice-example-common-web</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- # Spring -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <com.openease.env>${openease.env}</com.openease.env>
+            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
+            <log4j2.configurationFile>log4j2-${openease.env}.yaml</log4j2.configurationFile>
+          </systemPropertyVariables>
+        </configuration>
+        <executions>
+          <execution>
+            <id>repackage</id>
+            <configuration>
+              <classifier>${classifier.executable}</classifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>build-docker</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.soebes.maven.plugins</groupId>
+            <artifactId>echo-maven-plugin</artifactId>
+            <configuration>
+              <echos>
+                <echo>Properties:</echo>
+                <echo>- docker.image.name=${docker.image.name}</echo>
+                <echo>- project.version=${project.version}</echo>
+              </echos>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>echo</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>filter-dockerfiles</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>${project.basedir}/src/main/docker</directory>
+                      <filtering>true</filtering>
+                      <includes>
+                        <include>Dockerfile*</include>
+                      </includes>
+                    </resource>
+                    <resource>
+                      <directory>${project.basedir}/src/main/docker</directory>
+                      <filtering>false</filtering>
+                      <includes>
+                        <include>*</include>
+                      </includes>
+                      <excludes>
+                        <exclude>Dockerfile*</exclude>
+                      </excludes>
+                    </resource>
+                  </resources>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>filter-deploy-files</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>${project.basedir}/src/main/deploy</directory>
+                      <filtering>true</filtering>
+                      <includes>
+                        <include>**/*.yaml</include>
+                        <include>**/*.env</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                  <outputDirectory>${project.build.directory}/deploy</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <verbose>all</verbose>
+              <images>
+                <image>
+                  <name>${docker.image.name}:${project.version}</name>
+                  <alias>${project.artifactId}</alias>
+                  <build>
+                    <dockerFile>${project.build.directory}/Dockerfile</dockerFile>
+                  </build>
+                </image>
+              </images>
+            </configuration>
+            <executions>
+              <execution>
+                <id>build-docker-image</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>push-docker-image</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>push</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+</project>

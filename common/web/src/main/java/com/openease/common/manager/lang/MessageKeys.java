@@ -59,6 +59,22 @@ public class MessageKeys {
       "validation.paymentProcessRequest.billingToken.notBlank";
 
   /**
+   * Messages for {@link com.openease.common.manager.image.request.ImageCreateRequest}
+   */
+  public static final String VALIDATION_IMAGECREATEREQUEST_NAME_NOTBLANK =
+      "validation.imageCreateRequest.name.notBlank";
+  public static final String VALIDATION_IMAGECREATEREQUEST_TYPE_NOTNULL =
+      "validation.imageCreateRequest.type.notNull";
+  public static final String VALIDATION_IMAGECREATEREQUEST_WIDTH_MIN =
+      "validation.imageCreateRequest.width.min";
+  public static final String VALIDATION_IMAGECREATEREQUEST_HEIGHT_MIN =
+      "validation.imageCreateRequest.height.min";
+  public static final String VALIDATION_IMAGECREATEREQUEST_DATA_NOTNULL =
+      "validation.imageCreateRequest.data.notNull";
+  public static final String VALIDATION_IMAGECREATEREQUEST_DATA_MINMAX =
+      "validation.imageCreateRequest.data.minmax";
+
+  /**
    * Messages for {@link com.openease.common.manager.account.AccountManager}
    */
   public static final String MANAGER_ACCOUNT_DISABLED =

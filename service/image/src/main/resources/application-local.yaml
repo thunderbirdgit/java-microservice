@@ -1,0 +1,27 @@
+# Spring Boot
+server:
+  compression:
+    enabled: false
+management:
+  health:
+    elasticsearch:
+      enabled: false
+spring:
+  thymeleaf:
+    cache: false
+#  elasticsearch:
+#    rest:
+#      uris: "http://host.docker.internal:9200"
+
+# Config
+config:
+  url: "http://localhost:@service.port@"
+  mask-5xx-errors: false
+  filters:
+    debug:
+      enabled: true
+
+# Managers
+manager:
+  event-log:
+    enabled: false

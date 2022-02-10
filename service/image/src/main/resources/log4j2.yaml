@@ -1,0 +1,8 @@
+# DO NOT MODIFY THIS FILE
+# - this file is required because -Dlog4j2.configurationFile=log4j2-${OPENEASE_ENV}.yaml
+#   does not work unless this default file exists
+configuration:
+  name: "default"
+  loggers:
+    root:
+      level: "error"

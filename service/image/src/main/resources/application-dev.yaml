@@ -1,0 +1,7 @@
+# Config
+config:
+  url: "https://@service.name@.dev.openease.com"
+  mask-5xx-errors: false
+  filters:
+    debug:
+      enabled: true

@@ -7,17 +7,17 @@ ENV DEBIAN_FRONTEND="noninteractive" \
     OPENEASE_USER="ops"
 ENV LC_ALL="${LANG}"
 
-# Install/update OS packages
+# install/update OS packages
 RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y ca-certificates \
                        locales \
-                       wget \
-#                       curl \
-#                       zip \
 #                       net-tools \
 #                       iputils-ping \
 #                       telnet \
+                       wget \
+#                       curl \
+#                       zip \
 #                       python3 \
  && echo "${LANG} UTF-8" >> /etc/locale.gen \
  && locale-gen ${LANG} \
@@ -26,7 +26,7 @@ RUN apt-get update \
            /tmp/* \
            /var/tmp/*
 
-# Add "ops" user, group, and directories
+# create OPENEASE_USER user, group, and directories
 RUN addgroup --gid 1234 ${OPENEASE_USER} \
  && adduser --uid 1234 \
             --ingroup ${OPENEASE_USER} \
@@ -35,6 +35,7 @@ RUN addgroup --gid 1234 ${OPENEASE_USER} \
             --disabled-password \
             ${OPENEASE_USER}
 
+# switch to OPENEASE_USER
 USER ${OPENEASE_USER}
 
 WORKDIR ${OPENEASE_HOME}

@@ -49,9 +49,7 @@ public class EmailsController extends BaseApiController {
   }
 
   /**
-   * Call to send email
-   *
-   * @return {@link SuccessApiResponse}
+   * Send email
    */
   @PostMapping(path = {"", "/"})
   public SuccessApiResponse send(@RequestBody @Valid EmailSendRequest request) {

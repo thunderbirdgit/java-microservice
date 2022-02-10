@@ -2,8 +2,8 @@ FROM @docker.registry@/@docker.repo@/@docker.groupId@/base:@project.version@
 
 USER root
 
-### Install Java
-# Set version
+### install Java
+# set version
 ARG JAVA_VERSION_MAJOR="11"
 ARG JAVA_VERSION_MINOR="0"
 ARG JAVA_VERSION_PATCH="14.9.1"
@@ -12,7 +12,7 @@ ARG JAVA_VERSION_MD5="bc1bc7203435fb7eaca360f581af73f3"
 ENV JDK_HOME="/opt/java/java" \
     JAVA_VERSION="${JAVA_VERSION_MAJOR}.${JAVA_VERSION_MINOR}.${JAVA_VERSION_PATCH}"
 ARG JDK_ARCHIVE_FILENAME="amazon-corretto-${JAVA_VERSION}-${JAVA_VERSION_OSARCH}.tar.gz"
-# Download and unarchive
+# download and unarchive
 RUN mkdir -p /opt/java \
 # BEGIN - OPTION 1 - without MD5 check
 # && curl -jksSL "https://corretto.aws/downloads/resources/${JAVA_VERSION_MAJOR}.${JAVA_VERSION_MINOR}.${JAVA_VERSION_PATCH}/${JDK_ARCHIVE_FILENAME}" \
@@ -27,6 +27,7 @@ RUN mkdir -p /opt/java \
  && rm ${JDK_ARCHIVE_FILENAME} \
 # END - OPTION 2 - with MD5 check
  && ln -s /opt/java/amazon-corretto-${JAVA_VERSION}-${JAVA_VERSION_OSARCH} ${JDK_HOME} \
+# remove unwanted files
  && rm -rf ${JDK_HOME}/ADDITIONAL_LICENSE_INFO \
            ${JDK_HOME}/ASSEMBLY_EXCEPTION \
            ${JDK_HOME}/LICENSE \
