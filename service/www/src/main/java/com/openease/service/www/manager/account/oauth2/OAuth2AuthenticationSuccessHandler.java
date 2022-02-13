@@ -129,9 +129,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
       LOG.error(me::getMessage, me);
       throw new OAuth2AuthenticationException(me.getMessage());
     }
-    if (jwt == null) {
-      throw new OAuth2AuthenticationException("Created JWT is invalid");
-    }
 
     return UriComponentsBuilder.fromUriString(targetUrl)
         .queryParam(REDIRECT_URI_PARAM_TOKEN, URLEncoder.encode(jwt, UTF_8))

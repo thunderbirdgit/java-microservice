@@ -97,6 +97,10 @@ public class JwtManager {
           .compact();
     }
 
+    if (token == null) {
+      throw new GeneralManagerException(MANAGER_JWT_ERROR_GENERALFAILURE, "Unable to create JWT");
+    }
+
     return token;
   }
 

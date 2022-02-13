@@ -21,8 +21,8 @@ public class MessageKeys {
    */
   public static final String VALIDATION_EMAILRECIPIENT_EMAIL_NOTBLANK =
       "validation.emailRecipient.email.notBlank";
-  public static final String VALIDATION_EMAILRECIPIENT_EMAIL_EMAIL =
-      "validation.emailRecipient.email.email";
+  public static final String VALIDATION_EMAILRECIPIENT_EMAIL_INVALID =
+      "validation.emailRecipient.email.invalid";
 
   /**
    * Validation messages for {@link com.openease.common.manager.email.request.EmailAttachment}

@@ -74,9 +74,6 @@ public class SecurityManager {
 
     LOG.debug("Creating JWT for account username: [{}]", account::getUsername);
     String jwt = jwtManager.createJwt(authentication);
-    if (jwt == null) {
-      throw new RuntimeException("Sorry! Unable to create JWT");
-    }
 
     LOG.debug("Signed-in account username: [{}]", BaseAuthSecurityConfig::getSignedInUsername);
 
