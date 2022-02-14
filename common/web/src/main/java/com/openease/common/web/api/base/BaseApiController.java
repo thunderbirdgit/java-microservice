@@ -27,9 +27,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -86,6 +88,50 @@ public abstract class BaseApiController {
 //    if (!verified) {
 //      throw new ApiException(PRECONDITION_FAILED, MANAGER_CAPTCHA_INVALID);
 //    }
+  }
+
+  @ExceptionHandler(MissingServletRequestPartException.class)
+  protected ResponseEntity<ErrorApiResponse> handleMissingServletRequestPartException(MissingServletRequestPartException exception) {
+    LOG.warn(() -> exception.getClass().getSimpleName());
+
+    HttpStatus httpStatus = BAD_REQUEST;
+    Locale locale = LocaleContextHolder.getLocale();
+
+    // API response
+    ErrorApiResponse response = new ErrorApiResponse(httpStatus);
+    String localizedMessage = messageSource.getMessage(CONTROLLER_API_BASE_FIELDERROR, null, locale);
+    response.getStatus().setMessage(localizedMessage);
+    ApiFieldError apiFieldError = new ApiFieldError()
+        .setField(exception.getRequestPartName())
+        .setMessage(exception.getLocalizedMessage())
+        .setObjectName("Multipart - Form Data - Part");
+    response.getStatus().setAdditionalInfo(apiFieldError);
+    ResponseEntity<ErrorApiResponse> responseEntity = new ResponseEntity<>(response, httpStatus);
+
+    LOG.debug("response: {}", responseEntity::getBody);
+    return responseEntity;
+  }
+
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  protected ResponseEntity<ErrorApiResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
+    LOG.warn(() -> exception.getClass().getSimpleName());
+
+    HttpStatus httpStatus = BAD_REQUEST;
+    Locale locale = LocaleContextHolder.getLocale();
+
+    // API response
+    ErrorApiResponse response = new ErrorApiResponse(httpStatus);
+    String localizedMessage = messageSource.getMessage(CONTROLLER_API_BASE_FIELDERROR, null, locale);
+    response.getStatus().setMessage(localizedMessage);
+    ApiFieldError apiFieldError = new ApiFieldError()
+        .setField(exception.getParameterName())
+        .setMessage(exception.getLocalizedMessage())
+        .setObjectName(exception.getParameterType());
+    response.getStatus().setAdditionalInfo(apiFieldError);
+    ResponseEntity<ErrorApiResponse> responseEntity = new ResponseEntity<>(response, httpStatus);
+
+    LOG.debug("response: {}", responseEntity::getBody);
+    return responseEntity;
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
