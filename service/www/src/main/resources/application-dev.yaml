@@ -27,5 +27,8 @@ manager:
   remotePayment:
     api:
       baseUrl: "https://payment.dev.openease.com/v1/payments"
+  remoteImage:
+    api:
+      baseUrl: "https://image.dev.openease.com/v1/images"
   captcha:
     enabled: true

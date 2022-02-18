@@ -34,5 +34,8 @@ manager:
   remotePayment:
     api:
       baseUrl: "http://host.docker.internal:8380/v1/payments"
+  remoteImage:
+    api:
+      baseUrl: "http://host.docker.internal:8480/v1/images"
   captcha:
     enabled: false

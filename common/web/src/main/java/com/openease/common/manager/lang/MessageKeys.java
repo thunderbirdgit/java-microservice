@@ -161,6 +161,14 @@ public class MessageKeys {
       "manager.sms.error.remoteApiFailure";
 
   /**
+   * Messages for {@link com.openease.common.manager.image.RemoteImageManager}
+   */
+  public static final String MANAGER_IMAGE_ERROR_GENERALFAILURE =
+      "manager.image.error.generalFailure";
+  public static final String MANAGER_IMAGE_ERROR_REMOTEAPIFAILURE =
+      "manager.image.error.remoteApiFailure";
+
+  /**
    * Validation messages for {@link com.openease.common.manager.captcha.request.CaptchaVerifyRequest}
    */
   public static final String VALIDATION_CAPTCHAVERIFYREQUEST_USERTOKEN_NOTBLANK =
