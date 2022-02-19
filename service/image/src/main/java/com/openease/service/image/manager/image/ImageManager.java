@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.Optional;
 
 import static com.openease.common.data.lang.MessageKeys.CRUD_BADREQUEST;
@@ -126,6 +127,7 @@ public class ImageManager {
     String fileExtension = imageComponents[1];
     LOG.trace("file extension: {}", () -> fileExtension);
 
+    Image image = null;
     if (cacheMiss) {
       ImageType imageType;
       try {
@@ -140,7 +142,7 @@ public class ImageManager {
     } else {  // cache hit
       Optional<Image> optionalImage = imageDao.findById(imageBinary.getImageId());
       if (optionalImage.isPresent()) {
-        Image image = optionalImage.get();
+        image = optionalImage.get();
         if (!image.isApproved() || !image.isVisible()) {
           cache.invalidate(fileName);
           throw new GeneralManagerException(CRUD_NOTFOUND, "Image binary with image id [" + imageId + "] and image type [" + fileExtension + "] *not* found");
@@ -151,7 +153,23 @@ public class ImageManager {
       }
     }
 
+    setImageLastAccessed(image, imageBinary.getImageId());
+
     return imageBinary;
+  }
+
+  private void setImageLastAccessed(Image image, String imageId) {
+    if (image == null) {
+      Optional<Image> optionalImage = imageDao.findById(imageId);
+      if (optionalImage.isPresent()) {
+        image = optionalImage.get();
+      }
+    }
+
+    if (image != null) {
+      image.setLastAccessed(new Date());
+      imageDao.save(image);
+    }
   }
 
 }

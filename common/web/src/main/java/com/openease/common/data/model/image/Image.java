@@ -3,6 +3,8 @@ package com.openease.common.data.model.image;
 import com.openease.common.data.model.base.BaseAuditDataModel;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.util.Date;
+
 /**
  * Image data model
  *
@@ -18,6 +20,8 @@ public class Image extends BaseAuditDataModel<Image> {
   private boolean approved;
 
   private boolean visible;
+
+  private Date lastAccessed;
 
   public Image() {
     this(null);
@@ -54,6 +58,15 @@ public class Image extends BaseAuditDataModel<Image> {
 
   public Image setVisible(boolean visible) {
     this.visible = visible;
+    return this;
+  }
+
+  public Date getLastAccessed() {
+    return lastAccessed;
+  }
+
+  public Image setLastAccessed(Date lastAccessed) {
+    this.lastAccessed = lastAccessed;
     return this;
   }
 
