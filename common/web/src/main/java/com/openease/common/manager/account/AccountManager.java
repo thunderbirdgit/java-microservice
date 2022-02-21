@@ -696,7 +696,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     Future<Boolean> taskFuture = asyncTaskExecutor.submit(task);
   }
 
-  private void submitSendResetPasswordEmailTask(Account account) throws Exception {
+  private void submitSendResetPasswordEmailTask(Account account) {
     Locale locale = account.getLocale();
     String passwordResetUrl = pageManager.getPasswordResetUrl(account.getPasswordResetCode());
     SendResetPasswordEmailTask task = new SendResetPasswordEmailTask(locale, account, passwordResetUrl);
@@ -705,7 +705,7 @@ public class AccountManager implements UserDetailsService, UserDetailsPasswordSe
     Future<Boolean> taskFuture = asyncTaskExecutor.submit(task);
   }
 
-  private void submitSendNotifyPasswordChangeEmailTask(Account account) throws Exception {
+  private void submitSendNotifyPasswordChangeEmailTask(Account account) {
     Locale locale = account.getLocale();
     SendNotifyPasswordChangeEmailTask task = new SendNotifyPasswordChangeEmailTask(locale, account);
     LOG.debug("Submitting {} with id: {}", () -> task.getClass().getSimpleName(), task::getId);

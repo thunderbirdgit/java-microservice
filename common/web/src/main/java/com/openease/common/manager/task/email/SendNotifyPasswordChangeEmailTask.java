@@ -20,7 +20,7 @@ public class SendNotifyPasswordChangeEmailTask extends BaseSendTemplateEmailTask
 
   private static final transient Logger LOG = LogManager.getLogger(SendNotifyPasswordChangeEmailTask.class);
 
-  public SendNotifyPasswordChangeEmailTask(Locale locale, Account account) throws Exception {
+  public SendNotifyPasswordChangeEmailTask(Locale locale, Account account) {
     super(Email_HTML_NotifyPasswordChange, locale, account);
     templateModel.put(TEMPLATE_MODEL_FIRSTNAME, account.getFirstName());
     templateModel.put(TEMPLATE_MODEL_LASTNAME, account.getLastName());

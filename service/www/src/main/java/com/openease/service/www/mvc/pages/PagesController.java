@@ -94,7 +94,8 @@ public class PagesController extends BaseMvcController {
     LOG.debug("codeFound: {}", codeFound);
     model.addAttribute("codeFound", codeFound);
 
-    model.addAttribute("request", new AccountResetPasswordRequest().setPasswordResetCode(code));
+    AccountResetPasswordRequest request = pageManager.createAccountResetPasswordRequest(code);
+    model.addAttribute("request", request);
 
     /* commented-out because it allows malicious actors to do harvesting */
 //    if (!codeFound) {

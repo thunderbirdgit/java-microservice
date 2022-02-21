@@ -1,6 +1,7 @@
 package com.openease.common.manager.page;
 
 import com.openease.common.config.Config;
+import com.openease.common.manager.account.request.AccountResetPasswordRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,10 @@ public class PageManager {
 
   public String getPasswordResetUrl(String passwordResetCode) {
     return config.getFullyQualifiedUrl(PASSWORDRESET_CONTEXT_ABSOLUTE + "/" + passwordResetCode);
+  }
+
+  public AccountResetPasswordRequest createAccountResetPasswordRequest(String passwordResetCode) {
+    return new AccountResetPasswordRequest().setPasswordResetCode(passwordResetCode);
   }
 
 }

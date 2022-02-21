@@ -3,6 +3,7 @@ package com.openease.common.data.model.image;
 import com.openease.common.data.model.base.BaseAuditDataModel;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import static com.openease.common.data.model.image.ImageBinary.IMAGE_BINARIES;
 import static com.openease.common.data.model.image.ImageType.JPEG;
 
 /**
@@ -10,10 +11,13 @@ import static com.openease.common.data.model.image.ImageType.JPEG;
  *
  * @author Alan Czajkowski
  */
-@Document(indexName = ImageBinary.IMAGE_BINARIES)
+@Document(indexName = IMAGE_BINARIES)
 public class ImageBinary extends BaseAuditDataModel<ImageBinary> {
 
   public static final String IMAGE_BINARIES = "image-binaries";
+
+  public static final int DATA_MIN = 10;
+  public static final int DATA_MAX = 1048576;
 
   private String imageId;
 

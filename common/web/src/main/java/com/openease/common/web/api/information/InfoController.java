@@ -7,7 +7,6 @@ import com.openease.common.manager.info.response.InfoStatusResponse;
 import com.openease.common.web.api.base.BaseApiController;
 import com.openease.common.web.api.base.exception.ApiException;
 import com.openease.common.web.api.base.model.response.SuccessApiResponse;
-import com.openease.common.web.util.ApiUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +27,7 @@ import static com.openease.common.util.JsonUtils.toJson;
 import static com.openease.common.web.api.information.InfoController.INFO_CONTEXT;
 import static com.openease.common.web.lang.MessageKeys.INFO_CONTROLLER_ERROR4XX_MESSAGE;
 import static com.openease.common.web.lang.MessageKeys.INFO_CONTROLLER_ERROR5XX_MESSAGE;
+import static com.openease.common.web.util.ApiUtils.createSuccessApiResponse;
 import static org.springframework.http.HttpStatus.I_AM_A_TEAPOT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -65,7 +65,7 @@ public class InfoController extends BaseApiController {
     InfoStatusRequest infoStatusRequest = new InfoStatusRequest();
     infoStatusRequest.setLocale(userLocale);
     InfoStatusResponse infoStatusResponse = infoManager.status(infoStatusRequest);
-    SuccessApiResponse<InfoStatusResponse> response = ApiUtils.createSuccessApiResponse(infoStatusResponse);
+    SuccessApiResponse<InfoStatusResponse> response = createSuccessApiResponse(infoStatusResponse);
 
     LOG.debug("response: {}", response);
     return response;
@@ -82,7 +82,7 @@ public class InfoController extends BaseApiController {
   public SuccessApiResponse verifyValidator(@RequestBody @Valid InfoVerifyValidatorRequest request) {
     LOG.debug("request: {}", request);
 
-    SuccessApiResponse response = ApiUtils.createSuccessApiResponse();
+    SuccessApiResponse response = createSuccessApiResponse();
 
     LOG.debug("response: {}", response);
     return response;
@@ -100,7 +100,7 @@ public class InfoController extends BaseApiController {
   public SuccessApiResponse<String> verifyUtf8(@RequestParam(value = "q", required = false) String q) {
     LOG.debug("q: {}", q);
 
-    SuccessApiResponse<String> response = ApiUtils.createSuccessApiResponse(q);
+    SuccessApiResponse<String> response = createSuccessApiResponse(q);
 
     LOG.debug("response: {}", response);
     return response;

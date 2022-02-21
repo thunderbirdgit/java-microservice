@@ -7,7 +7,6 @@ import com.openease.common.web.api.ApiVersion;
 import com.openease.common.web.api.base.BaseApiController;
 import com.openease.common.web.api.base.model.response.SuccessApiResponse;
 import com.openease.common.web.api.enumeration.Region;
-import com.openease.common.web.util.ApiUtils;
 import com.openease.service.www.manager.subscription.Plan;
 import com.openease.service.www.manager.subscription.SubscriptionManager;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.openease.common.util.JsonUtils.toJson;
+import static com.openease.common.web.util.ApiUtils.createSuccessApiResponse;
 import static com.openease.service.www.api.enumeration.EnumsController.ENUMS_CONTEXT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -60,49 +60,49 @@ public class EnumsController extends BaseApiController {
 
   @GetMapping(path = {"", "/"})
   public SuccessApiResponse<String[]> getEndpoints() {
-    SuccessApiResponse<String[]> response = ApiUtils.createSuccessApiResponse(ENDPOINTS);
+    SuccessApiResponse<String[]> response = createSuccessApiResponse(ENDPOINTS);
     LOG.debug("response: {}", response);
     return response;
   }
 
   @GetMapping(path = "/api-versions")
   public SuccessApiResponse<ApiVersion[]> getApiVersions() {
-    SuccessApiResponse<ApiVersion[]> response = ApiUtils.createSuccessApiResponse(ApiVersion.values());
+    SuccessApiResponse<ApiVersion[]> response = createSuccessApiResponse(ApiVersion.values());
     LOG.debug("response: {}", response);
     return response;
   }
 
   @GetMapping(path = "/regions")
   public SuccessApiResponse<List<Map<String, Object>>> getRegions() {
-    SuccessApiResponse<List<Map<String, Object>>> response = ApiUtils.createSuccessApiResponse(Region.regions());
+    SuccessApiResponse<List<Map<String, Object>>> response = createSuccessApiResponse(Region.regions());
     LOG.debug("response: {}", response);
     return response;
   }
 
   @GetMapping(path = "/oauth2/providers")
   public SuccessApiResponse<OAuth2Provider[]> getOAuth2Providers() {
-    SuccessApiResponse<OAuth2Provider[]> response = ApiUtils.createSuccessApiResponse(OAuth2Provider.values());
+    SuccessApiResponse<OAuth2Provider[]> response = createSuccessApiResponse(OAuth2Provider.values());
     LOG.debug("response: {}", response);
     return response;
   }
 
   @GetMapping(path = "/account/genders")
   public SuccessApiResponse<Gender[]> getAccountGenders() {
-    SuccessApiResponse<Gender[]> response = ApiUtils.createSuccessApiResponse(Gender.values());
+    SuccessApiResponse<Gender[]> response = createSuccessApiResponse(Gender.values());
     LOG.debug("response: {}", response);
     return response;
   }
 
   @GetMapping(path = "/account/tiers")
   public SuccessApiResponse<Tier[]> getAccountTiers() {
-    SuccessApiResponse<Tier[]> response = ApiUtils.createSuccessApiResponse(Tier.values());
+    SuccessApiResponse<Tier[]> response = createSuccessApiResponse(Tier.values());
     LOG.debug("response: {}", response);
     return response;
   }
 
   @GetMapping(path = "/account/subscription/plans")
   public SuccessApiResponse<List<Plan>> getAccountSubscriptionPlans() {
-    SuccessApiResponse<List<Plan>> response = ApiUtils.createSuccessApiResponse(subscriptionManager.getPlans());
+    SuccessApiResponse<List<Plan>> response = createSuccessApiResponse(subscriptionManager.getPlans());
     LOG.debug("response: {}", response);
     return response;
   }

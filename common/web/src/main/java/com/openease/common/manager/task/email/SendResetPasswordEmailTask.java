@@ -22,7 +22,7 @@ public class SendResetPasswordEmailTask extends BaseSendTemplateEmailTask {
 
   private static final String TEMPLATE_MODEL_PASSWORDRESETURL = "passwordResetUrl";
 
-  public SendResetPasswordEmailTask(Locale locale, Account account, String passwordResetUrl) throws Exception {
+  public SendResetPasswordEmailTask(Locale locale, Account account, String passwordResetUrl) {
     super(Email_HTML_ResetPassword, locale, account);
     templateModel.put(TEMPLATE_MODEL_FIRSTNAME, account.getFirstName());
     templateModel.put(TEMPLATE_MODEL_LASTNAME, account.getLastName());

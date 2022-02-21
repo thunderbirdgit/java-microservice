@@ -8,6 +8,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import static com.openease.common.data.model.image.ImageBinary.DATA_MAX;
+import static com.openease.common.data.model.image.ImageBinary.DATA_MIN;
 import static com.openease.common.manager.lang.MessageKeys.VALIDATION_IMAGECREATEREQUEST_DATA_MINMAX;
 import static com.openease.common.manager.lang.MessageKeys.VALIDATION_IMAGECREATEREQUEST_DATA_NOTNULL;
 import static com.openease.common.manager.lang.MessageKeys.VALIDATION_IMAGECREATEREQUEST_HEIGHT_MIN;
@@ -35,7 +37,7 @@ public class ImageCreateRequest extends BaseManagerModel {
   private int height;
 
   @NotNull(message = "{" + VALIDATION_IMAGECREATEREQUEST_DATA_NOTNULL + "}")
-  @Size(min = 10, max = 1048576, message = "{" + VALIDATION_IMAGECREATEREQUEST_DATA_MINMAX + "}")
+  @Size(min = DATA_MIN, max = DATA_MAX, message = "{" + VALIDATION_IMAGECREATEREQUEST_DATA_MINMAX + "}")
   private byte[] data;
 
   public String getName() {
